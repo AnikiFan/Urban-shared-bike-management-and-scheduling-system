@@ -18,11 +18,9 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./*"],
-      "@/lib/*": ["./app/lib/*"],
-      "@/ui/*": ["./app/ui/*"],
+      "@/*": ["./*"]
     }
   },
   "include": [
@@ -30,8 +28,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/lib/placeholder-data.ts",
-    "scripts/seed.js"
+    "lib/placeholder-data.ts",
+    "scripts/seed.js",
+    "ui/**/*",
+    "lib/**/*"
   ],
   "exclude": ["node_modules"]
 }
