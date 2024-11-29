@@ -1,0 +1,98 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model bike {
+  bike_id                       String                          @id @db.Char(20)
+  production_date               DateTime                        @db.Date
+  coordinate                    Unsupported("point")
+  battery_remaining_capacity    Float?                          @db.Real
+  bike_status                   bike_status[]
+  contain                       contain[]
+  scheduling                    scheduling[]
+  to_be_reviewed                to_be_reviewed[]
+  to_be_reviewed_proof_material to_be_reviewed_proof_material[]
+  to_be_reviewed_status         to_be_reviewed_status[]
+  usage                         usage[]
+}
+
+model bike_status {
+  bike_id String @db.Char(20)
+  status  status
+  bike    bike   @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, status])
+}
+
+model contain {
+  bike_id         String       @db.Char(20)
+  parking_area_id Int          @default(autoincrement())
+  bike            bike         @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+  parking_area    parking_area @relation(fields: [parking_area_id], references: [parking_area_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, parking_area_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model parking_area {
+  parking_area_id Int                  @id @default(autoincrement())
+  name            String               @db.Char(20)
+  coordinate      Unsupported("point")
+  radius          Float?               @db.Real
+  contain         contain[]
+}
+
+model scheduling {
+  bike_id    String               @db.Char(20)
+  time       DateTime             @db.Timestamp(6)
+  coordinate Unsupported("point")
+  action     Boolean
+  bike       bike                 @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, time])
+}
+
+model to_be_reviewed {
+  bike_id String   @db.Char(20)
+  time    DateTime @db.Timestamp(6)
+  bike    bike     @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, time])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model to_be_reviewed_proof_material {
+  bike_id        String   @db.Char(20)
+  time           DateTime @db.Timestamp(6)
+  no             Int      @db.SmallInt
+  proof_material Bytes
+  bike           bike     @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, time, no])
+}
+
+model to_be_reviewed_status {
+  bike_id String   @db.Char(20)
+  time    DateTime @db.Timestamp(6)
+  status  status
+  bike    bike     @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, time, status])
+}
+
+model usage {
+  bike_id    String               @db.Char(20)
+  time       DateTime             @db.Timestamp(6)
+  coordinate Unsupported("point")
+  action     Boolean
+  bike       bike                 @relation(fields: [bike_id], references: [bike_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([bike_id, time])
+}
+
+enum status {
+  active
+  abnormal
+}
