@@ -4,40 +4,50 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "db-pull":"dotenv -e .env.development -- npx prisma db pull",
-    "db-migrate":"dotenv -e .env.development -- npx prisma migrate deploy",
-    "db-0-init":"npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
-    "db-generate":"dotenv -e .env.development -- npx prisma generate"
+    "db-pull": "dotenv -f .env.development -- npx drizzle-kit pull --config=./drizzle.config.ts",
+    "db-generate": "dotenv -f .env.development -- npx drizzle-kit generate --schema=./drizzle/schema.ts --dialect=postgresql",
+    "db-seed": "ts-node --transpile-only prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.4",
-    "@prisma/client": "^6.0.0",
+    "@sequelize/core": "7.0.0-alpha.42",
+    "@sequelize/postgres": "7.0.0-alpha.43",
     "@tailwindcss/forms": "^0.5.7",
     "@vercel/postgres": "^0.8.0",
     "autoprefixer": "10.4.19",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "deck.gl": "^9.0.36",
+    "dotenv": "^16.4.5",
     "dotenv-cli": "^7.4.4",
-    "jose": "^5.9.6",
+    "drizzle-orm": "^0.36.4",
     "lint": "^0.8.19",
     "next": "15.0.0-canary.56",
     "next-auth": "5.0.0-beta.21",
+    "path": "^0.12.7",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
     "postcss": "8.4.38",
     "react": "19.0.0-rc-f38c22b244-20240704",
     "react-dom": "19.0.0-rc-f38c22b244-20240704",
+    "sequelize-auto": "^0.8.8",
     "tailwindcss": "3.4.4",
+    "ts-node": "^10.9.2",
     "typescript": "5.5.2",
     "use-debounce": "^10.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "20.14.8",
+    "@types/pg": "^8.11.10",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
-    "prisma": "^6.0.0"
+    "drizzle-kit": "^0.28.1",
+    "tsx": "^4.19.2"
   },
   "engines": {
     "node": ">=20.12.0"

@@ -1,0 +1,523 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.bike": {
+      "name": "bike",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "production_date": {
+          "name": "production_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "battery_remaining_capacity": {
+          "name": "battery_remaining_capacity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "bike_battery_remaining_capacity_check": {
+          "name": "bike_battery_remaining_capacity_check",
+          "value": "(battery_remaining_capacity >= (0)::double precision) AND (battery_remaining_capacity <= (1)::double precision)"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.parking_area": {
+      "name": "parking_area",
+      "schema": "",
+      "columns": {
+        "parking_area_id": {
+          "name": "parking_area_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "radius": {
+          "name": "radius",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "parking_area_radius_check": {
+          "name": "parking_area_radius_check",
+          "value": "radius > (10)::double precision"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.bike_status": {
+      "name": "bike_status",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "bike_status_bike_id_fkey": {
+          "name": "bike_status_bike_id_fkey",
+          "tableFrom": "bike_status",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "bike_status_pkey": {
+          "name": "bike_status_pkey",
+          "columns": [
+            "bike_id",
+            "status"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed": {
+      "name": "to_be_reviewed",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_bike_id_fkey": {
+          "name": "to_be_reviewed_bike_id_fkey",
+          "tableFrom": "to_be_reviewed",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_pkey": {
+          "name": "to_be_reviewed_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.contain": {
+      "name": "contain",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parking_area_id": {
+          "name": "parking_area_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "contain_bike_id_fkey": {
+          "name": "contain_bike_id_fkey",
+          "tableFrom": "contain",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contain_parking_area_id_fkey": {
+          "name": "contain_parking_area_id_fkey",
+          "tableFrom": "contain",
+          "tableTo": "parking_area",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "parking_area_id"
+          ],
+          "columnsTo": [
+            "parking_area_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "contain_pkey": {
+          "name": "contain_pkey",
+          "columns": [
+            "bike_id",
+            "parking_area_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed_status": {
+      "name": "to_be_reviewed_status",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_status_bike_id_fkey": {
+          "name": "to_be_reviewed_status_bike_id_fkey",
+          "tableFrom": "to_be_reviewed_status",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_status_pkey": {
+          "name": "to_be_reviewed_status_pkey",
+          "columns": [
+            "bike_id",
+            "time",
+            "status"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.usage": {
+      "name": "usage",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usage_bike_id_fkey": {
+          "name": "usage_bike_id_fkey",
+          "tableFrom": "usage",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "usage_pkey": {
+          "name": "usage_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.scheduling": {
+      "name": "scheduling",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "scheduling_bike_id_fkey": {
+          "name": "scheduling_bike_id_fkey",
+          "tableFrom": "scheduling",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "scheduling_pkey": {
+          "name": "scheduling_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed_proof_material": {
+      "name": "to_be_reviewed_proof_material",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no": {
+          "name": "no",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "proof_material": {
+          "name": "proof_material",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_proof_material_bike_id_fkey": {
+          "name": "to_be_reviewed_proof_material_bike_id_fkey",
+          "tableFrom": "to_be_reviewed_proof_material",
+          "tableTo": "bike",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_proof_material_pkey": {
+          "name": "to_be_reviewed_proof_material_pkey",
+          "columns": [
+            "bike_id",
+            "time",
+            "no"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "to_be_reviewed_proof_material_no_check": {
+          "name": "to_be_reviewed_proof_material_no_check",
+          "value": "no >= 0"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.status": {
+      "name": "status",
+      "values": [
+        "NORMAL",
+        "ILLEGAL_PARKING",
+        "LOW_BATTERY",
+        "IDLE",
+        "LUFFL",
+        "ABNORMAL",
+        "TO_MAINTAIN",
+        "OUTDATED",
+        "IN_STORAGE"
+      ],
+      "schema": "public"
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {}
+  }
+}
