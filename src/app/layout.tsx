@@ -1,14 +1,15 @@
 import '@/ui/global.css'
-import {inter} from '@/ui/fonts'
 import { Metadata } from 'next';
+import {serif} from '@/ui/fonts'
+import {Providers} from './providers'
+
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Acme Dashboard',
-    default: 'Acme Dashboard',
+    template: '%s | Urban Shared Bike Management and Scheduling System',
+    default: 'Urban Shared Bike Management and Scheduling System Dashboard',
   },
-  description: 'The official Next.js Course Dashboard, built with App Router.',
-  metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+  description: 'Urban Shared Bike Management and Scheduling System Dashboard carried out by Fx 2254298',
 };
 
 export default function RootLayout({
@@ -17,8 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+    <html lang="zh-cn">
+    <body className={`light ${serif.className} antialiased`}>
+    <Providers>
+        {children}
+    </Providers>
+    </body>
     </html>
-  );
+);
 }
