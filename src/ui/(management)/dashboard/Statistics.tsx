@@ -1,15 +1,20 @@
 'use client'
-import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Spacer} from "@nextui-org/react";
 
 export default function StatisticsCards() {
     return (
         <>
-            <div className="w-full flex flex-row gap-4">
+            <div className="w-full flex flex-row">
                 <MyCard/>
+                <Spacer x={4}/>
                 <MyCard/>
+                <Spacer x={4}/>
                 <MyCard/>
+                <Spacer x={4}/>
                 <MyCard/>
+                <Spacer x={4}/>
                 <MyCard/>
+                <Spacer x={4}/>
                 <MyCard/>
             </div>
         </>
