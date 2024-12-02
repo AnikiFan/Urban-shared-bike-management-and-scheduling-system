@@ -10,11 +10,13 @@ import {
 } from '@heroicons/react/24/outline';
 import React, {useState} from "react";
 import TimePickerModal from "@/ui/(management)/dashboard/model";
-import {Listbox, ListboxItem, ListboxSection, cn} from "@nextui-org/react";
-import {AddNoteIcon} from "./AddNoteIcon.jsx";
-import {CopyDocumentIcon} from "./CopyDocumentIcon.jsx";
-import {EditDocumentIcon} from "./EditDocumentIcon.jsx";
-import {DeleteDocumentIcon} from "./DeleteDocumentIcon.jsx";
+import {Listbox, ListboxItem, ListboxSection} from "@nextui-org/react";
+import {
+    AddNoteIcon,
+    CopyDocumentIcon,
+    DeleteDocumentIcon,
+    EditDocumentIcon
+} from '@/ui/icons'
 const links = [
     {
         name: '主页',
@@ -58,7 +60,6 @@ const ListboxWrapper = ({children}: { children: React.ReactNode }) => (
         {children}
     </div>
 );
-
 export default function NavLinks() {
     const [isOpen, setIsOpen] = useState(false)
     const iconClasses = "text-xl text-default-500 pointer-events-none flex-shrink-0";
@@ -70,35 +71,35 @@ export default function NavLinks() {
                         <ListboxItem
                             key="homepage"
                             description="主页"
-                            startContent={<AddNoteIcon className={iconClasses}/>}
+                            startContent={<AddNoteIcon/>}
                         >
                             主页
                         </ListboxItem>
                         <ListboxItem
                             key="refresh"
                             description="刷新统计数据"
-                            startContent={<CopyDocumentIcon className={iconClasses}/>}
+                            startContent={<CopyDocumentIcon/>}
                         >
                             刷新数据
                         </ListboxItem>
                         <ListboxItem
                             key="schedulingLog"
                             description="查询调度数据"
-                            startContent={<EditDocumentIcon className={iconClasses}/>}
+                            startContent={<EditDocumentIcon/>}
                         >
                             查询调度数据
                         </ListboxItem>
                         <ListboxItem
                             key="export"
                             description="导出调度数据"
-                            startContent={<EditDocumentIcon className={iconClasses}/>}
+                            startContent={<EditDocumentIcon/>}
                         >
                             导出调度数据
                         </ListboxItem>
                         <ListboxItem
                             key="usageMap"
                             description="使用记录图"
-                            startContent={<EditDocumentIcon className={iconClasses}/>}
+                            startContent={<EditDocumentIcon/>}
                             onClick={() => setIsOpen(true)}
                         >
                             使用记录图
@@ -106,14 +107,14 @@ export default function NavLinks() {
                         <ListboxItem
                             key="modify"
                             description="修改数据"
-                            startContent={<EditDocumentIcon className={iconClasses}/>}
+                            startContent={<EditDocumentIcon/>}
                         >
                             修改数据
                         </ListboxItem>
                         <ListboxItem
                             key="review"
                             description="审查"
-                            startContent={<EditDocumentIcon className={iconClasses}/>}
+                            startContent={<EditDocumentIcon/>}
                         >
                             审查
                         </ListboxItem>
@@ -124,7 +125,7 @@ export default function NavLinks() {
                             className="text-danger"
                             color="danger"
                             description="Permanently delete the file"
-                            startContent={<DeleteDocumentIcon className={cn(iconClasses, "text-danger")}/>}
+                            startContent={<DeleteDocumentIcon/>}
                         >
                             Delete file
                         </ListboxItem>
