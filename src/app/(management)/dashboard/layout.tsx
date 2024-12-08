@@ -1,21 +1,14 @@
-import SideNav from "@/ui/(management)/dashboard/sidenav";
-import ManagementBreadCrumb from "@/ui/(management)/dashboard/ManagementBreadCrumb";
+import Sidenav from "@/ui/components/Sidenav";
+import ManagementBreadCrumb from "@/ui/components/ManagementBreadCrumb";
 import {Spacer} from "@nextui-org/react";
+import React from "react";
 
-export default function Layout({
-                                   children,
-                               }: {
-    children: React.ReactNode
-}) {
+export default function Layout({children}: { children: React.ReactNode }) {
     return (
-        <div className="flex h-screen flex-col p-6 md:flex-row md:overflow-hidden md:p-10">
-            <div className="w-full flex-none md:w-64">
-                <SideNav/>
-            </div>
-            <Spacer x={4}/>
-            <div className="flex flex-col md:overflow-y-auto">
+        <div className="flex h-screen p-6 flex-row overflow-hidden space-x-6">
+            <Sidenav/>
+            <div className="flex flex-col overflow-hidden space-y-4 flex-grow">
                 <ManagementBreadCrumb/>
-                <Spacer y={4}/>
                 {children}
             </div>
         </div>
