@@ -1,13 +1,23 @@
 'use client'
 import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
+import {usePathname, useRouter} from "next/navigation";
+import {mapPageToName,Page} from "@/ui/components/NavLinks";
+
 export default function ManagementBreadCrumb() {
+    const pathname = usePathname();
+    const paths = pathname.split("/");
+    const router = useRouter();
     return (
         <Breadcrumbs separator="/" itemClasses={{separator: "px-2"}} size='lg'>
-            <BreadcrumbItem>Home</BreadcrumbItem>
-            <BreadcrumbItem>Music</BreadcrumbItem>
-            <BreadcrumbItem>Artist</BreadcrumbItem>
-            <BreadcrumbItem>Album</BreadcrumbItem>
-            <BreadcrumbItem>Song</BreadcrumbItem>
+            {
+                paths.map((path, i) => (
+                    <BreadcrumbItem onPress={() => {
+                        router.push(paths.slice(0,i + 1).join('/'))
+                    }}>
+                        {mapPageToName(path as Page)}
+                    </BreadcrumbItem>
+                ), paths)
+            }
         </Breadcrumbs>
     );
 }

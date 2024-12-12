@@ -1,18 +1,37 @@
 'use client';
 import React from "react";
-import {Listbox, ListboxItem, ListboxSection, Button} from "@nextui-org/react";
-import Link from "next/link";
+import {Listbox, ListboxItem, ListboxSection, Button,Link} from "@nextui-org/react";
 import {
     AddNoteIcon,
     CopyDocumentIcon,
     DeleteDocumentIcon,
     EditDocumentIcon
 } from '@/ui/icons'
+import {useRouter} from 'next/navigation'
+
+export type Page = 'dashboard'|'modifyPanel'|'scheduleMap'|'usageMap'|'reviewPanel'
+export type PageName = '主页'|'修改数据'|'使用记录图'|'审查'|'查询调度记录'
+
+export function mapPageToName(page:Page):PageName {
+    switch (page) {
+        case 'dashboard':
+            return '主页'
+        case 'modifyPanel':
+            return '修改数据'
+        case 'scheduleMap':
+            return '查询调度记录'
+        case 'usageMap':
+            return '使用记录图'
+        case 'reviewPanel':
+            return '审查'
+    }
+}
 
 export default function NavLinks() {
+    const router = useRouter();
     return (
         <div className="w-full border-small px-1 py-2 rounded-small border-default-200 ">
-            <Listbox variant="flat" aria-label="Listbox menu with sections">
+            <Listbox variant="flat" aria-label="Listbox menu with sections" itemClasses={{base:"my-1"}}>
                 <ListboxSection title="Action" showDivider>
                     <ListboxItem
                         key="refresh"
@@ -27,7 +46,7 @@ export default function NavLinks() {
                         key="homepage"
                         description="主页"
                         startContent={<AddNoteIcon/>}
-                        href="/dashboard"
+                        onClick={()=>router.push('/dashboard')}
                     >
                         主页
                     </ListboxItem>
@@ -35,7 +54,7 @@ export default function NavLinks() {
                         key="schedulingLog"
                         description="调度数据"
                         startContent={<EditDocumentIcon/>}
-                        href="/dashboard/scheduleMap"
+                        onClick={()=>router.push('/dashboard/scheduleMap')}
                     >
                         查询调度数据
                     </ListboxItem>
@@ -43,7 +62,7 @@ export default function NavLinks() {
                         key="usageMap"
                         description="使用记录图"
                         startContent={<EditDocumentIcon/>}
-                        href="/dashboard/usageMap"
+                        onClick={()=>router.push('/dashboard/usageMap')}
                     >
                         使用记录图
                     </ListboxItem>
@@ -51,7 +70,7 @@ export default function NavLinks() {
                         key="modify"
                         description="修改数据"
                         startContent={<EditDocumentIcon/>}
-                        href="/dashboard/modifyPanel"
+                        onClick={()=>router.push('/dashboard/modifyPanel')}
                     >
                         修改数据
                     </ListboxItem>
@@ -59,7 +78,7 @@ export default function NavLinks() {
                         key="review"
                         description="审查"
                         startContent={<EditDocumentIcon/>}
-                        href="/dashboard/reviewPanel"
+                        onClick={()=>router.push('/dashboard/reviewPanel')}
                     >
                         审查
                     </ListboxItem>

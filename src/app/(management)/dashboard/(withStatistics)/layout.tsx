@@ -1,5 +1,5 @@
 import React from 'react'
-import StatisticsCards from "@/ui/components/Statistics";
+import StatisticsCards from "@/ui/components/StatisticsCards";
 export default function withStatisticsLayout({children}: {children: React.ReactNode}) {
     return(
         <>

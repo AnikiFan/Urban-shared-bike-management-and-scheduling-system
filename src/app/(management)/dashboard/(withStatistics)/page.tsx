@@ -1,5 +1,5 @@
 import {Metadata} from "next";
-import StatisticsCards from "@/ui/components/Statistics";
+import StatisticsCards from "@/ui/components/StatisticsCards";
 import DistributionMap from "@/ui/maps/DistributionMap";
 
 export const metadata: Metadata = {
@@ -7,9 +7,6 @@ export const metadata: Metadata = {
 }
 export default function Dashboard() {
     return (
-        <>
-            <StatisticsCards/>
-            <DistributionMap/>
-        </>
+        <DistributionMap/>
     )
 }

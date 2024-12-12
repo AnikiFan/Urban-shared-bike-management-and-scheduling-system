@@ -17,7 +17,6 @@ const INITIAL_VIEW_STATE = {
     bearing: 0,
     pitch: 30
 };
-
 export default function ScheduleMap() {
     const onClick = (info: any) => {
         if (info.object) {
@@ -25,7 +24,6 @@ export default function ScheduleMap() {
             alert(`${info.object.properties.name} (${info.object.properties.abbrev})`);
         }
     };
-
     // @ts-ignore
     return (
         <MapWrapper>
