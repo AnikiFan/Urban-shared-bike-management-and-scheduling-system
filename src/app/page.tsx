@@ -1,9 +1,9 @@
-import Logo from '@/ui/logo';
+import Logo from '@/ui/components/Logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import {sans} from "@/ui/fonts";
 import Image from "next/image";
-export default function WelcomePage() {
+export default function () {
   return (
     <main className="flex min-h-screen flex-col p-6">
       <div className="h-52 rounded-lg bg-blue-500 p-4">

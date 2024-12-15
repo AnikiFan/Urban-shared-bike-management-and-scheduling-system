@@ -1,7 +1,7 @@
 'use client'
 import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
 
-export default function StatisticsCards() {
+export default function () {
     return (
         <div className="w-full flex flex-row space-x-4">
             <MyCard/>

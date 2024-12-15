@@ -4,7 +4,7 @@ import {BikeLogo} from "@/ui/icons";
 export const ChineseTitle = "城市共享单车管理与调度平台"
 export const EnglishTitle = "Urban Shared Bike Management and Scheduling System"
 
-export default function Logo() {
+export default function () {
     let height = 126;
     return (
         <div className={`flex flex-row ${sans.className} text-white items-end justify-start size-full space-x-1`}>

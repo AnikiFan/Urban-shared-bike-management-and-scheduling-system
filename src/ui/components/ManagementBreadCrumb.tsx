@@ -3,7 +3,7 @@ import {Breadcrumbs, BreadcrumbItem} from "@nextui-org/react";
 import {usePathname, useRouter} from "next/navigation";
 import {mapPageToName,Page} from "@/ui/components/NavLinks";
 
-export default function ManagementBreadCrumb() {
+export default function () {
     const pathname = usePathname();
     const paths = pathname.split("/");
     const router = useRouter();

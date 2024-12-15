@@ -27,7 +27,7 @@ export function mapPageToName(page:Page):PageName {
     }
 }
 
-export default function NavLinks() {
+export default function () {
     const router = useRouter();
     return (
         <div className="w-full border-small px-1 py-2 rounded-small border-default-200 ">

@@ -1,5 +1,5 @@
 import {Card, CardBody, CardHeader, Divider} from "@nextui-org/react";
-export default function StateModifyCard() {
+export default function () {
     return(
         <Card className='flex-grow h-full shadow-lg bg-gradient-to-b'>
             <CardHeader>

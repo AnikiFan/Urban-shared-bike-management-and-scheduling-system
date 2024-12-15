@@ -1,5 +1,4 @@
 import {Metadata} from "next";
-import StatisticsCards from "@/ui/components/StatisticsCards";
 import DistributionMap from "@/ui/maps/DistributionMap";
 
 export const metadata: Metadata = {

@@ -1,3 +1,4 @@
+'use client'
 import {Autocomplete, AutocompleteItem} from "@nextui-org/react";
 const animals = [
     {label: "Cat", key: "cat", description: "The second most popular pet in the world"},
@@ -27,7 +28,7 @@ const animals = [
     {label: "Crocodile", key: "crocodile", description: "A large semiaquatic reptile"},
 ];
 
-export default function ScheduleSelector() {
+export default function () {
     return (
         <div className="flex-grow">
             <Autocomplete label="Select an animal" size='lg'>

@@ -1,8 +1,9 @@
+'use client'
 import React from "react";
 import {DateRangePicker} from "@nextui-org/react";
 import {parseZonedDateTime} from "@internationalized/date";
 
-export default function TimePicker() {
+export default function () {
     return (
         <DateRangePicker
             label="查询时间段"

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     },
     description: 'Urban Shared Bike Management and Scheduling System Dashboard built by Fx 2254298',
 };
-export default function RootLayout({children}: { children: React.ReactNode; })
+export default function ({children}: { children: React.ReactNode; })
 {
     return (
         <html lang="zh-cn">

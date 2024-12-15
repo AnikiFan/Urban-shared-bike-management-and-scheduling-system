@@ -1,7 +1,7 @@
 import ScheduleSelector from "./ScheduleSelector";
 import {Button} from "@nextui-org/react";
 
-export default function ScheduleSelectBar() {
+export default function () {
     return (
         <div className="flex flex-row space-x-4 items-center">
             <ScheduleSelector/>

@@ -1,4 +1,3 @@
-'use client'
 import TimePicker from "@/ui/components/TimePicker";
 import UsageMap from "@/ui/maps/UsageMap";
 

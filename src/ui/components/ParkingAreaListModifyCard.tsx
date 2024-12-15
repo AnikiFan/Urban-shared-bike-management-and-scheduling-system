@@ -1,7 +1,7 @@
 'use client'
 import {Card, Divider, CardHeader, CardBody,Listbox,ListboxItem} from "@nextui-org/react";
 
-export default function ParkingAreaListModifyCard() {
+export default function () {
     return (
         <Card className="h-full flex-grow shadow-lg bg-gradient-to-b">
             <CardHeader>停车区域清单</CardHeader>

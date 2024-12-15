@@ -1,4 +1,3 @@
-'use client'
 import React from "react";
 import ScheduleMap from "@/ui/maps/ScheduleMap";
 import ScheduleSelectBar from "@/ui/components/ScheduleSelectBar";
