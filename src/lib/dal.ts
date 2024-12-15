@@ -2,6 +2,7 @@ import 'server-only'
 import * as model from '@/db/schema'
 import * as type from  '@/lib/definition'
 import {db} from '@/db/index'
+import {users} from "@/drizzle/schema";
 export async function pushUploadedUsageData(uploadedUsageData:type.uploadedUsageData){
     try{
 

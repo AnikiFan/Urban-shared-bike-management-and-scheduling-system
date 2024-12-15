@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
-import {redirect} from "next/navigation";
 import {updateSession} from "@/lib/auth";
+
 export const config = {
     matcher: [
         /*

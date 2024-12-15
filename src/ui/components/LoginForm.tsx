@@ -1,16 +1,20 @@
 'use client'
-import {login} from "@/lib/auth";
-import {Form, Input, Button, Spacer} from "@nextui-org/react";
+import {login} from "@/lib/login";
+import {Form, Input, Button, Spacer, Alert} from "@nextui-org/react";
+import {useActionState} from 'react'
 
-export default async function () {
+const initialState = {
+    message: "",
+};
+
+export default function () {
+    const [state, formAction, pending] = useActionState(login, initialState)
+
+
     return (
         <Form
             validationBehavior='native'
-            onSubmit={
-                (e) => {
-                    e.preventDefault();
-                    login(new FormData(e.currentTarget))
-                }}
+            action={formAction}
         >
             <Input
                 isRequired
@@ -34,6 +38,10 @@ export default async function () {
             <Button type="submit" className='bg-blue-500 text-white w-full'>
                 提交
             </Button>
+            {pending ? <Alert color='default' title='Loading...'/> : <></>}
+            {state.message &&
+                <Alert color='danger' title={state.message}/>
+            }
         </Form>
     )
 }
