@@ -95,3 +95,23 @@ export type uploadedBikeInfo={
     batteryRemainingCapacity: typeof bike.$inferInsert.batteryRemainingCapacity,
     status:typeof bikeStatus.$inferInsert.status
 };
+
+export type bikeStatistics={
+    bikeNum: number,
+    normalNum: number,
+    illegalParkingNum: number,
+    lowBatteryNum: number,
+    idleNum: number,
+    LUFLTNum: number,
+    abnormalNum: number,
+    toMaintainNum: number,
+    outdatedNum: number,
+    inStorageNum: number,
+};
+
+export type cardInfo={
+    title:string,
+    description:string,
+    statistics:number,
+    percentage:number
+}

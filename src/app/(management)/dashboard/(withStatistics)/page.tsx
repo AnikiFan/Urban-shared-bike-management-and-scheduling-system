@@ -1,13 +1,14 @@
 import {Metadata} from "next";
 import DistributionMap from "@/ui/maps/DistributionMap";
-import {fetchMapData} from "@/lib/dal";
+import {fetchMapData,fetchParkingAreaInfo} from "@/lib/dal";
 
 export const metadata: Metadata = {
     title: 'Management Dashboard',
 }
 export default async function Dashboard() {
-    const data = await fetchMapData();
+    const mapData = await fetchMapData();
+    const parkingAreaInfo = await fetchParkingAreaInfo()
     return (
-        <DistributionMap/>
+        <DistributionMap mapData={mapData} parkingAreaInfo={parkingAreaInfo}/>
     )
 }

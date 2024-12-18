@@ -10,7 +10,7 @@ export const bike = pgTable("bike", {
 	bikeId: char("bike_id", { length: 20 }).primaryKey().notNull(),
 	productionDate: date("production_date").notNull(),
 	coordinate: point().notNull(),
-	batteryRemainingCapacity: real("battery_remaining_capacity"),
+	batteryRemainingCapacity: real("battery_remaining_capacity").notNull(),
 }, (table) => {
 	return {
 		bikeBatteryRemainingCapacityCheck: check("bike_battery_remaining_capacity_check", sql`(battery_remaining_capacity >= (0)::double precision) AND (battery_remaining_capacity <= (1)::double precision)`),
@@ -21,7 +21,7 @@ export const parkingArea = pgTable("parking_area", {
 	parkingAreaId: serial("parking_area_id").primaryKey().notNull(),
 	name: char({ length: 20 }).notNull(),
 	coordinate: point().notNull(),
-	radius: real(),
+	radius: real().notNull(),
 }, (table) => {
 	return {
 		parkingAreaRadiusCheck: check("parking_area_radius_check", sql`radius > (10)::double precision`),

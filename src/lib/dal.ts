@@ -3,8 +3,8 @@ import * as model from '@/db/schema'
 import * as type from '@/lib/definition'
 import {db} from '@/db/index'
 import {users} from "@/drizzle/schema";
-import {bike, bikeStatus} from "@/db/schema";
-import {eq} from "drizzle-orm";
+import {bike, bikeStatus, parkingArea} from "@/db/schema";
+import {count, eq, sql} from "drizzle-orm";
 
 export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsageData) {
     try {
@@ -51,14 +51,18 @@ export async function pushSchedulingLog(schedulingLog: type.schedulingLog) {
     }
 }
 
-export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo> {
+export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
     try {
-
+        const result = await db.select({
+            name: parkingArea.name,
+            coordinate: parkingArea.coordinate,
+            radius: parkingArea.radius,
+        }).from(parkingArea)
+        return result;
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch parking area')
     }
-    return any
 }
 
 export async function fetchMapData(): Promise<type.mapData[]> {
@@ -68,11 +72,32 @@ export async function fetchMapData(): Promise<type.mapData[]> {
             status: bikeStatus.status,
             coordinate: bike.coordinate
         }).from(bike).leftJoin(bikeStatus, eq(bike.bikeId, bikeStatus.bikeId))
-        console.log(result[0])
         return result;
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch map data')
+    }
+}
+
+export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
+    try {
+        const bikeNum = (await db.select({count: count()}).from(bike))[0].count
+        const bikeStatistics = await db.select({count: count()}).from(bikeStatus).groupBy(bikeStatus.status)
+        return {
+            bikeNum, // 使用传入的 bikeNum
+            normalNum: bikeStatistics[0]?.count || 0,
+            illegalParkingNum: bikeStatistics[1]?.count || 0,
+            lowBatteryNum: bikeStatistics[2]?.count || 0,
+            idleNum: bikeStatistics[3]?.count || 0,
+            LUFLTNum: bikeStatistics[4]?.count || 0,
+            abnormalNum: bikeStatistics[5]?.count || 0,
+            toMaintainNum: bikeStatistics[6]?.count || 0,
+            outdatedNum: bikeStatistics[7]?.count || 0,
+            inStorageNum: bikeStatistics[8]?.count||0
+        };
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to fetch bike statistics')
     }
 }
 
