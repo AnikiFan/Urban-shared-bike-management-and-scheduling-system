@@ -58,8 +58,8 @@ export type previousStatus={
 //map data
 export type mapData={
     bikeId:typeof bike.$inferInsert.bikeId
-    status:typeof bikeStatus.$inferInsert.status
-    coordinate: typeof bike.$inferInsert.bikeId
+    status:typeof bikeStatus.$inferInsert.status | null
+    coordinate: typeof bike.$inferInsert.coordinate
 };
 
 //usage data

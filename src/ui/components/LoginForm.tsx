@@ -15,6 +15,7 @@ export default function () {
         <Form
             validationBehavior='native'
             action={formAction}
+            className={'w-96'}
         >
             <Input
                 isRequired
@@ -39,7 +40,7 @@ export default function () {
                 提交
             </Button>
             {pending ? <Alert color='default' title='Loading...'/> : <></>}
-            {state.message &&
+            {state.message && !pending &&
                 <Alert color='danger' title={state.message}/>
             }
         </Form>

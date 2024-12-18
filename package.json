@@ -15,6 +15,7 @@
     "@deck.gl/arcgis": "^9.0.36",
     "@deck.gl/core": "^9.0.36",
     "@deck.gl/layers": "^9.0.36",
+    "@deck.gl/mapbox": "^9.0.38",
     "@deck.gl/react": "^9.0.36",
     "@esri/react-arcgis": "^5.2.0",
     "@heroicons/react": "^2.1.4",

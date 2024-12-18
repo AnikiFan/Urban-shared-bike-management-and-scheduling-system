@@ -17,6 +17,9 @@ importers:
       '@deck.gl/layers':
         specifier: ^9.0.36
         version: 9.0.36(@deck.gl/core@9.0.36)(@loaders.gl/core@4.3.3)(@luma.gl/core@9.0.27)(@luma.gl/engine@9.0.27(@luma.gl/core@9.0.27))
+      '@deck.gl/mapbox':
+        specifier: ^9.0.38
+        version: 9.0.38(@deck.gl/core@9.0.36)(@luma.gl/core@9.0.27)
       '@deck.gl/react':
         specifier: ^9.0.36
         version: 9.0.36(@deck.gl/core@9.0.36)(react-dom@19.0.0-rc-f38c22b244-20240704(react@19.0.0-rc-f38c22b244-20240704))(react@19.0.0-rc-f38c22b244-20240704)
@@ -241,6 +244,12 @@ packages:
 
   '@deck.gl/mapbox@9.0.36':
     resolution: {integrity: sha512-fbkIXKNL4LkYUOMjS9r2WtQymjlRRRkT6OpclENS5c3AzTviH8yJGU22Luki/N/6iWZxmCJDXKw209dra8ZGbQ==}
+    peerDependencies:
+      '@deck.gl/core': ^9.0.0
+      '@luma.gl/core': ~9.0.0
+
+  '@deck.gl/mapbox@9.0.38':
+    resolution: {integrity: sha512-jTGfG1OYFFxQkGFPeLEtEBQF6XOyB6Zlv6s8NvhxaekFgwVVWZIg/vv/qCeMLyfN4Ok2lbqxfXZuVGX2P6EvyA==}
     peerDependencies:
       '@deck.gl/core': ^9.0.0
       '@luma.gl/core': ~9.0.0
@@ -4789,6 +4798,13 @@ snapshots:
       earcut: 2.2.4
 
   '@deck.gl/mapbox@9.0.36(@deck.gl/core@9.0.36)(@luma.gl/core@9.0.27)':
+    dependencies:
+      '@deck.gl/core': 9.0.36
+      '@luma.gl/constants': 9.0.27
+      '@luma.gl/core': 9.0.27
+      '@math.gl/web-mercator': 4.1.0
+
+  '@deck.gl/mapbox@9.0.38(@deck.gl/core@9.0.36)(@luma.gl/core@9.0.27)':
     dependencies:
       '@deck.gl/core': 9.0.36
       '@luma.gl/constants': 9.0.27
