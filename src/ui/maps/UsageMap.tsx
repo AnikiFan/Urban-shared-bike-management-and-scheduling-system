@@ -5,20 +5,15 @@ import {Map, NavigationControl, Popup, useControl} from 'react-map-gl';
 import {GeoJsonLayer, ArcLayer, DeckProps} from 'deck.gl';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-
-// source: Natural Earth http://www.naturalearthdata.com/ via geojson.xyz
-const AIR_PORTS =
-    'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_airports.geojson';
-
-// Set your Mapbox token here or via environment variable
-// const MAPBOX_TOKEN = "pk.eyJ1IjoidnY4ejg2IiwiYSI6ImNtNGVxdXc0ODEyMnIyanEweHdwZzF0b2kifQ.B5Num2zwPZCsKSGqu07iqQ"; // eslint-disable-line
+import {usageData} from "@/lib/definition";
+import {usageColor} from "@/lib/utils";
 
 const INITIAL_VIEW_STATE = {
-    latitude: 51.47,
-    longitude: 0.45,
-    zoom: 4,
+    latitude: 31.251180073866866,
+    longitude:121.45280296476405,
+    zoom: 12,
     bearing: 0,
-    pitch: 30
+    pitch: 0
 };
 
 const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -29,35 +24,17 @@ function DeckGLOverlay(props: DeckProps) {
     return null;
 }
 
-export default function () {
+export default function ({usageData}:{usageData:usageData[]}) {
     const [selected, setSelected] = useState(null);
     const layers = [
-        new GeoJsonLayer({
-            id: 'airports',
-            data: AIR_PORTS,
-            // Styles
-            filled: true,
-            pointRadiusMinPixels: 2,
-            pointRadiusScale: 2000,
-            getPointRadius: f => 11 - f.properties.scalerank,
-            getFillColor: [200, 0, 80, 180],
-            // Interactive props
-            pickable: true,
-            autoHighlight: true,
-            onClick: info => setSelected(info.object)
-            // beforeId: 'waterway-label' // In interleaved mode render the layer under map labels
+        new ArcLayer<usageData>({
+            id:'bikeUsageArcLayer',
+            data:usageData,
+            getSourcePosition:(d:usageData)=>d.startCoordinate,
+            getTargetPosition:(d:usageData)=>d.endCoordinate,
+            getSourceColor:(d:usageData)=>usageColor(d.startTime),
+            getTargetColor:(d:usageData)=>usageColor(d.endTime),
         }),
-        new ArcLayer({
-            id: 'arcs',
-            data: AIR_PORTS,
-            dataTransform: d => d.features.filter(f => f.properties.scalerank < 4),
-            // Styles
-            getSourcePosition: f => [-0.4531566, 51.4709959], // London
-            getTargetPosition: f => f.geometry.coordinates,
-            getSourceColor: [0, 128, 200],
-            getTargetColor: [200, 0, 80],
-            getWidth: 1
-        })
     ];
 
     return (

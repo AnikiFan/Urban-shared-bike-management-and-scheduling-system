@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import MapWrapper from './MapWrapper';
 import {Map, NavigationControl, Popup, useControl} from 'react-map-gl';
-import {GeoJsonLayer, ArcLayer, DeckProps, ScatterplotLayer, HeatmapLayer} from 'deck.gl';
+import {GeoJsonLayer, ArcLayer, DeckProps, ScatterplotLayer, HeatmapLayer,IconLayer} from 'deck.gl';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {mapData,parkingAreaInfo} from "@/lib/definition";
@@ -54,6 +54,18 @@ export default function ({mapData,parkingAreaInfo}:{mapData:mapData[],parkingAre
             filled:true,
             getFillColor:[0,255,140,100]
 
+        }),
+        new IconLayer<parkingAreaInfo>({
+            id:"parkingAreaIconLayer",
+            data:parkingAreaInfo,
+            getPosition:(d:parkingAreaInfo)=>d.coordinate,
+            getColor:[0,140,255],
+            getSize:20,
+            sizeMinPixels:10,
+            getIcon:(d:parkingAreaInfo)=>'marker',
+            iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
+            iconMapping: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.json',
+            pickable:true
         }),
         new HeatmapLayer<mapData>({
             id:'heatmap',

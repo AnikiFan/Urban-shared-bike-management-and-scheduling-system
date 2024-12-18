@@ -3,8 +3,10 @@ import * as model from '@/db/schema'
 import * as type from '@/lib/definition'
 import {db} from '@/db/index'
 import {users} from "@/drizzle/schema";
-import {bike, bikeStatus, parkingArea} from "@/db/schema";
-import {count, eq, sql} from "drizzle-orm";
+import {bike, bikeStatus, parkingArea, usage} from "@/db/schema";
+import {and, count, eq, gte, lt, sql} from "drizzle-orm";
+import {datetimeRange} from "@/lib/definition";
+import {toPostgreTimestamp} from "@/lib/utils";
 
 export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsageData) {
     try {
@@ -101,14 +103,15 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
     }
 }
 
-export async function fetchUsageData(): Promise<type.usageData> {
+export async function fetchUsageData(datetimeRange:datetimeRange): Promise<type.usage[]> {
     try {
-
+        const {start,end} = datetimeRange
+        const result =await db.select().from(usage).where(and(gte(usage.time,toPostgreTimestamp(start)),lt(usage.time,toPostgreTimestamp(end))))
+        return result
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch usage data')
     }
-    return any
 }
 
 export async function fetchBikeStatus(): Promise<type.bikeStatus> {

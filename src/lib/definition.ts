@@ -115,3 +115,24 @@ export type cardInfo={
     statistics:number,
     percentage:number
 }
+
+export type datetime={
+    year:number,
+    month:number,
+    day:number,
+    hour:number,
+    minute:number,
+    second:number,
+}
+
+export type datetimeRange={
+    start:datetime,
+    end:datetime,
+}
+
+export type usage={
+    bikeId:typeof usage.$inferInsert.bikeId,
+    time:typeof usage.$inferInsert.time,
+    coordinate:typeof usage.$inferInsert.coordinate,
+    action:typeof usage.$inferInsert.action,
+}

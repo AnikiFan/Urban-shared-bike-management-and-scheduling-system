@@ -1,11 +1,11 @@
 'use client'
-import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@nextui-org/react";
+import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, card} from "@nextui-org/react";
 import {cardInfo} from "@/lib/definition";
 
 export default function ({cardInfo}: { cardInfo: cardInfo[] }) {
     return (
         <div className="w-full grid grid-cols-10 gap-4">
-            {cardInfo.map(cardInfo => (<MyCard cardInfo={cardInfo}/>))}
+            {cardInfo.map(cardInfo => (<MyCard cardInfo={cardInfo} key={cardInfo.title}/>))}
         </div>
     )
 }
