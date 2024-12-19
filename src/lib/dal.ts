@@ -3,7 +3,7 @@ import * as model from '@/db/schema'
 import * as type from '@/lib/definition'
 import {db} from '@/db/index'
 import {users} from "@/drizzle/schema";
-import {bike, bikeStatus, parkingArea, usage} from "@/db/schema";
+import {bike, bikeStatus, parkingArea, scheduling, usage} from "@/db/schema";
 import {and, count, eq, gte, lt, sql} from "drizzle-orm";
 import {datetimeRange} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
@@ -164,12 +164,24 @@ export async function fetchChangeForm(): Promise<type.changeForm> {
     return any
 }
 
-export async function fetchSchedulingHistory(): Promise<type.schedulingHistory> {
+export async function fetchSchedulingHistory(bikeId:string): Promise<type.schedulingHistory[]> {
     try {
-
+        return await db.select({
+            time:scheduling.time,
+            coordinate:scheduling.coordinate,
+            action:scheduling.action
+        }).from(scheduling).where(eq(scheduling.bikeId,bikeId)).orderBy(scheduling.time)
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch scheduling history')
     }
-    return any
+}
+
+export async function fetchBikeList(): Promise<{bikeId:string}[]> {
+    try {
+        return await db.select({bikeId:bike.bikeId}).from(bike)
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to fetch scheduling history')
+    }
 }

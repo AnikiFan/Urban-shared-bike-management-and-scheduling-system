@@ -7,7 +7,12 @@ export type schedulingData={
 };
 export type schedulingLog = schedulingData;
 export type schedulingHistory = schedulingData;
-export type requiredSchedulingHistory = schedulingData;
+export type requiredSchedulingHistory ={
+    startCoordinate:typeof usage.$inferInsert.coordinate,
+    startTime:typeof usage.$inferInsert.time,
+    endCoordinate:typeof usage.$inferInsert.coordinate,
+    endTime:typeof usage.$inferInsert.time,
+};
 
 // parking area info
 export type parkingAreaInfo={

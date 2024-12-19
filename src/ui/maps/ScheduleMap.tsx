@@ -1,10 +1,14 @@
 'use client'
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MapWrapper from './MapWrapper';
 import {Map, NavigationControl, Popup, useControl} from 'react-map-gl';
 import {GeoJsonLayer, ArcLayer, DeckProps} from 'deck.gl';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import {useSelected} from "@/ui/components/SelectContext";
+import {getSchedulingHistory} from "@/lib/actions";
+import {requiredSchedulingHistory, schedulingData} from "@/lib/definition";
+import {usageColor} from "@/lib/utils";
 
 // source: Natural Earth http://www.naturalearthdata.com/ via geojson.xyz
 const AIR_PORTS =
@@ -12,13 +16,12 @@ const AIR_PORTS =
 
 // Set your Mapbox token here or via environment variable
 // const MAPBOX_TOKEN = "pk.eyJ1IjoidnY4ejg2IiwiYSI6ImNtNGVxdXc0ODEyMnIyanEweHdwZzF0b2kifQ.B5Num2zwPZCsKSGqu07iqQ"; // eslint-disable-line
-
 const INITIAL_VIEW_STATE = {
-    latitude: 51.47,
-    longitude: 0.45,
-    zoom: 4,
+    latitude: 31.251180073866866,
+    longitude:121.45280296476405,
+    zoom: 12,
     bearing: 0,
-    pitch: 30
+    pitch: 0
 };
 
 const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -30,33 +33,18 @@ function DeckGLOverlay(props: DeckProps) {
 }
 
 export default function UsageMap() {
-    const [selected, setSelected] = useState(null);
+    const selectedBike = useSelected();
+    const [scheduleHistory,setScheduleHistory] = useState<requiredSchedulingHistory[]>([]);
+    useEffect(() => {getSchedulingHistory(selectedBike).then((value)=>setScheduleHistory(value))},[selectedBike])
     const layers = [
-        new GeoJsonLayer({
-            id: 'airports',
-            data: AIR_PORTS,
-            // Styles
-            filled: true,
-            pointRadiusMinPixels: 2,
-            pointRadiusScale: 2000,
-            getPointRadius: f => 11 - f.properties.scalerank,
-            getFillColor: [200, 0, 80, 180],
-            // Interactive props
-            pickable: true,
-            autoHighlight: true,
-            onClick: info => setSelected(info.object)
-            // beforeId: 'waterway-label' // In interleaved mode render the layer under map labels
-        }),
         new ArcLayer({
-            id: 'arcs',
-            data: AIR_PORTS,
-            dataTransform: d => d.features.filter(f => f.properties.scalerank < 4),
-            // Styles
-            getSourcePosition: f => [-0.4531566, 51.4709959], // London
-            getTargetPosition: f => f.geometry.coordinates,
-            getSourceColor: [0, 128, 200],
-            getTargetColor: [200, 0, 80],
-            getWidth: 1
+            id: 'schedulingHistoryArcLayer',
+            data: scheduleHistory,
+            getSourcePosition:(d:requiredSchedulingHistory)=>d.startCoordinate,
+            getTargetPosition:(d:requiredSchedulingHistory)=>d.endCoordinate,
+            getSourceColor:(d:requiredSchedulingHistory)=>usageColor(d.startTime),
+            getTargetColor:(d:requiredSchedulingHistory)=>usageColor(d.endTime),
+            getWidth:10
         })
     ];
 
@@ -67,17 +55,6 @@ export default function UsageMap() {
                 mapStyle={MAP_STYLE}
                 mapboxAccessToken={'pk.eyJ1IjoidnY4ejg2IiwiYSI6ImNtNGVxdXc0ODEyMnIyanEweHdwZzF0b2kifQ.B5Num2zwPZCsKSGqu07iqQ'}
             >
-                {selected && (
-                    <Popup
-                        key={selected.properties.name}
-                        anchor="bottom"
-                        style={{zIndex: 10}} /* position above deck.gl canvas */
-                        longitude={selected.geometry.coordinates[0]}
-                        latitude={selected.geometry.coordinates[1]}
-                    >
-                        {selected.properties.name} ({selected.properties.abbrev})
-                    </Popup>
-                )}
                 <DeckGLOverlay layers={layers} /* interleaved*/ />
                 <NavigationControl position="top-left"/>
             </Map>

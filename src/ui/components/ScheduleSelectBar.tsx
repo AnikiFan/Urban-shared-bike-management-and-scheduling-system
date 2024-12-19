@@ -1,11 +1,21 @@
+'use client'
 import ScheduleSelector from "./ScheduleSelector";
-import {Button} from "@nextui-org/react";
+import {useEffect,useState} from "react";
+import {useSelected} from "@/ui/components/SelectContext";
+import {getSchedulingHistory} from "@/lib/actions";
+import {requiredSchedulingHistory} from "@/lib/definition";
+import ExportButton from "@/ui/components/ExportButton";
 
 export default function () {
+    const [schedulingHistory, setSchedulingHistory] = useState<requiredSchedulingHistory[]>([])
+    const selected = useSelected();
+    useEffect(() => {
+        getSchedulingHistory(selected).then((value)=>setSchedulingHistory(value));
+    }, [selected]);
     return (
         <div className="flex flex-row space-x-4 items-center">
-            <ScheduleSelector/>
-            <Button className='h-full w-1/6'>Button</Button>
+            <ScheduleSelector />
+            <ExportButton schedulingHistory={schedulingHistory} selected={selected} />
         </div>
     )
 }
