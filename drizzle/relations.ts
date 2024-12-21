@@ -1,5 +1,22 @@
 import { relations } from "drizzle-orm/relations";
-import { bike, contain, parkingArea, bikeStatus, toBeReviewed, toBeReviewedStatus, toBeReviewedProofMaterial, scheduling, usage } from "./schema";
+import { bike, toBeReviewed, contain, parkingArea, bikeStatus, toBeReviewedStatus, scheduling, toBeReviewedProofMaterial, usage } from "./schema";
+
+export const toBeReviewedRelations = relations(toBeReviewed, ({one}) => ({
+	bike: one(bike, {
+		fields: [toBeReviewed.bikeId],
+		references: [bike.bikeId]
+	}),
+}));
+
+export const bikeRelations = relations(bike, ({many}) => ({
+	toBeRevieweds: many(toBeReviewed),
+	contains: many(contain),
+	bikeStatuses: many(bikeStatus),
+	toBeReviewedStatuses: many(toBeReviewedStatus),
+	schedulings: many(scheduling),
+	toBeReviewedProofMaterials: many(toBeReviewedProofMaterial),
+	usages: many(usage),
+}));
 
 export const containRelations = relations(contain, ({one}) => ({
 	bike: one(bike, {
@@ -10,16 +27,6 @@ export const containRelations = relations(contain, ({one}) => ({
 		fields: [contain.parkingAreaId],
 		references: [parkingArea.parkingAreaId]
 	}),
-}));
-
-export const bikeRelations = relations(bike, ({many}) => ({
-	contains: many(contain),
-	bikeStatuses: many(bikeStatus),
-	toBeRevieweds: many(toBeReviewed),
-	toBeReviewedStatuses: many(toBeReviewedStatus),
-	toBeReviewedProofMaterials: many(toBeReviewedProofMaterial),
-	schedulings: many(scheduling),
-	usages: many(usage),
 }));
 
 export const parkingAreaRelations = relations(parkingArea, ({many}) => ({
@@ -33,13 +40,6 @@ export const bikeStatusRelations = relations(bikeStatus, ({one}) => ({
 	}),
 }));
 
-export const toBeReviewedRelations = relations(toBeReviewed, ({one}) => ({
-	bike: one(bike, {
-		fields: [toBeReviewed.bikeId],
-		references: [bike.bikeId]
-	}),
-}));
-
 export const toBeReviewedStatusRelations = relations(toBeReviewedStatus, ({one}) => ({
 	bike: one(bike, {
 		fields: [toBeReviewedStatus.bikeId],
@@ -47,16 +47,16 @@ export const toBeReviewedStatusRelations = relations(toBeReviewedStatus, ({one})
 	}),
 }));
 
-export const toBeReviewedProofMaterialRelations = relations(toBeReviewedProofMaterial, ({one}) => ({
+export const schedulingRelations = relations(scheduling, ({one}) => ({
 	bike: one(bike, {
-		fields: [toBeReviewedProofMaterial.bikeId],
+		fields: [scheduling.bikeId],
 		references: [bike.bikeId]
 	}),
 }));
 
-export const schedulingRelations = relations(scheduling, ({one}) => ({
+export const toBeReviewedProofMaterialRelations = relations(toBeReviewedProofMaterial, ({one}) => ({
 	bike: one(bike, {
-		fields: [scheduling.bikeId],
+		fields: [toBeReviewedProofMaterial.bikeId],
 		references: [bike.bikeId]
 	}),
 }));

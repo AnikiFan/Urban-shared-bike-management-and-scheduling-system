@@ -1,0 +1,603 @@
+{
+  "id": "47d1f70c-b288-41a6-84ac-0719b8cb5a02",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.bike": {
+      "name": "bike",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "production_date": {
+          "name": "production_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "battery_remaining_capacity": {
+          "name": "battery_remaining_capacity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "bike_battery_remaining_capacity_check": {
+          "name": "bike_battery_remaining_capacity_check",
+          "value": "(battery_remaining_capacity >= (0)::double precision) AND (battery_remaining_capacity <= (1)::double precision)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.bike_status": {
+      "name": "bike_status",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "bike_status_bike_id_fkey": {
+          "name": "bike_status_bike_id_fkey",
+          "tableFrom": "bike_status",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "bike_status_pkey": {
+          "name": "bike_status_pkey",
+          "columns": [
+            "bike_id",
+            "status"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.contain": {
+      "name": "contain",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parking_area_id": {
+          "name": "parking_area_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "contain_bike_id_fkey": {
+          "name": "contain_bike_id_fkey",
+          "tableFrom": "contain",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contain_parking_area_id_fkey": {
+          "name": "contain_parking_area_id_fkey",
+          "tableFrom": "contain",
+          "tableTo": "parking_area",
+          "columnsFrom": [
+            "parking_area_id"
+          ],
+          "columnsTo": [
+            "parking_area_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "contain_pkey": {
+          "name": "contain_pkey",
+          "columns": [
+            "bike_id",
+            "parking_area_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.parking_area": {
+      "name": "parking_area",
+      "schema": "",
+      "columns": {
+        "parking_area_id": {
+          "name": "parking_area_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "radius": {
+          "name": "radius",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "parking_area_radius_check": {
+          "name": "parking_area_radius_check",
+          "value": "radius > (10)::double precision"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.scheduling": {
+      "name": "scheduling",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "scheduling_bike_id_fkey": {
+          "name": "scheduling_bike_id_fkey",
+          "tableFrom": "scheduling",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "scheduling_pkey": {
+          "name": "scheduling_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.spatial_ref_sys": {
+      "name": "spatial_ref_sys",
+      "schema": "",
+      "columns": {
+        "srid": {
+          "name": "srid",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "auth_name": {
+          "name": "auth_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auth_srid": {
+          "name": "auth_srid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srtext": {
+          "name": "srtext",
+          "type": "varchar(2048)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proj4Text": {
+          "name": "proj4Text",
+          "type": "varchar(2048)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spatial_ref_sys_srid_check": {
+          "name": "spatial_ref_sys_srid_check",
+          "value": "(srid > 0) AND (srid <= 998999)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed": {
+      "name": "to_be_reviewed",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_bike_id_fkey": {
+          "name": "to_be_reviewed_bike_id_fkey",
+          "tableFrom": "to_be_reviewed",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_pkey": {
+          "name": "to_be_reviewed_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed_proof_material": {
+      "name": "to_be_reviewed_proof_material",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no": {
+          "name": "no",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "proof_material": {
+          "name": "proof_material",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_proof_material_bike_id_fkey": {
+          "name": "to_be_reviewed_proof_material_bike_id_fkey",
+          "tableFrom": "to_be_reviewed_proof_material",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_proof_material_pkey": {
+          "name": "to_be_reviewed_proof_material_pkey",
+          "columns": [
+            "bike_id",
+            "time",
+            "no"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "to_be_reviewed_proof_material_no_check": {
+          "name": "to_be_reviewed_proof_material_no_check",
+          "value": "no >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.to_be_reviewed_status": {
+      "name": "to_be_reviewed_status",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "to_be_reviewed_status_bike_id_fkey": {
+          "name": "to_be_reviewed_status_bike_id_fkey",
+          "tableFrom": "to_be_reviewed_status",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "to_be_reviewed_status_pkey": {
+          "name": "to_be_reviewed_status_pkey",
+          "columns": [
+            "bike_id",
+            "time",
+            "status"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.usage": {
+      "name": "usage",
+      "schema": "",
+      "columns": {
+        "bike_id": {
+          "name": "bike_id",
+          "type": "char(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "coordinate": {
+          "name": "coordinate",
+          "type": "point",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usage_bike_id_fkey": {
+          "name": "usage_bike_id_fkey",
+          "tableFrom": "usage",
+          "tableTo": "bike",
+          "columnsFrom": [
+            "bike_id"
+          ],
+          "columnsTo": [
+            "bike_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "usage_pkey": {
+          "name": "usage_pkey",
+          "columns": [
+            "bike_id",
+            "time"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "encrypted_password": {
+          "name": "encrypted_password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "MANAGER",
+        "ANALYST",
+        "SCHEDULER"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "NORMAL",
+        "ILLEGAL_PARKING",
+        "LOW_BATTERY",
+        "IDLE",
+        "LUFLT",
+        "ABNORMAL",
+        "TO_MAINTAIN",
+        "OUTDATED",
+        "IN_STORAGE"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

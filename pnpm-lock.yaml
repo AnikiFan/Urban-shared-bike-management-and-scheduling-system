@@ -86,6 +86,9 @@ importers:
       path:
         specifier: ^0.12.7
         version: 0.12.7
+      pg:
+        specifier: ^8.13.1
+        version: 8.13.1(pg-native@3.2.0)
       pg-hstore:
         specifier: ^2.3.4
         version: 2.3.4
@@ -9182,8 +9185,7 @@ snapshots:
   pg-cloudflare@1.1.1:
     optional: true
 
-  pg-connection-string@2.7.0:
-    optional: true
+  pg-connection-string@2.7.0: {}
 
   pg-hstore@2.3.4:
     dependencies:
@@ -9201,7 +9203,6 @@ snapshots:
   pg-pool@3.7.0(pg@8.13.1(pg-native@3.2.0)):
     dependencies:
       pg: 8.13.1(pg-native@3.2.0)
-    optional: true
 
   pg-protocol@1.7.0: {}
 
@@ -9241,12 +9242,10 @@ snapshots:
     optionalDependencies:
       pg-cloudflare: 1.1.1
       pg-native: 3.2.0
-    optional: true
 
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
-    optional: true
 
   picocolors@1.1.1: {}
 
@@ -9586,8 +9585,7 @@ snapshots:
     dependencies:
       extend-shallow: 3.0.2
 
-  split2@4.2.0:
-    optional: true
+  split2@4.2.0: {}
 
   sprintf-js@1.0.3: {}
 

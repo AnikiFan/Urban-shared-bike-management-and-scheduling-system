@@ -24,9 +24,11 @@ export type parkingAreaInfo={
 // change form
 export type changeForm={
     bike_id:typeof bike.$inferInsert.bikeId,
-    status:typeof bikeStatus.$inferInsert.status,
-    proofMaterial:typeof toBeReviewedProofMaterial.$inferInsert.proofMaterial
+    time: typeof toBeReviewedStatus.$inferInsert.time,
+    status:typeof bikeStatus.$inferInsert.status[],
+    proofMaterial:typeof toBeReviewedProofMaterial.$inferInsert.proofMaterial[]
 };
+
 // comment
 export type comment={
     reply:boolean

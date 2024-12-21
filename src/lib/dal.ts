@@ -3,9 +3,18 @@ import * as model from '@/db/schema'
 import * as type from '@/lib/definition'
 import {db} from '@/db/index'
 import {users} from "@/drizzle/schema";
-import {bike, bikeStatus, parkingArea, scheduling, usage} from "@/db/schema";
+import {
+    bike,
+    bikeStatus,
+    parkingArea,
+    scheduling,
+    toBeReviewed,
+    toBeReviewedProofMaterial,
+    toBeReviewedStatus,
+    usage
+} from "@/db/schema";
 import {and, count, eq, gte, lt, sql} from "drizzle-orm";
-import {datetimeRange} from "@/lib/definition";
+import {changeForm, datetimeRange} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
 
 export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsageData) {
@@ -95,7 +104,7 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
             abnormalNum: bikeStatistics[5]?.count || 0,
             toMaintainNum: bikeStatistics[6]?.count || 0,
             outdatedNum: bikeStatistics[7]?.count || 0,
-            inStorageNum: bikeStatistics[8]?.count||0
+            inStorageNum: bikeStatistics[8]?.count || 0
         };
     } catch (error) {
         console.log('Database Error', error)
@@ -103,10 +112,10 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
     }
 }
 
-export async function fetchUsageData(datetimeRange:datetimeRange): Promise<type.usage[]> {
+export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type.usage[]> {
     try {
-        const {start,end} = datetimeRange
-        const result =await db.select().from(usage).where(and(gte(usage.time,toPostgreTimestamp(start)),lt(usage.time,toPostgreTimestamp(end))))
+        const {start, end} = datetimeRange
+        const result = await db.select().from(usage).where(and(gte(usage.time, toPostgreTimestamp(start)), lt(usage.time, toPostgreTimestamp(end))))
         return result
     } catch (error) {
         console.log('Database Error', error)
@@ -156,30 +165,37 @@ export async function fetchBikeInfo(): Promise<type.bikeInfo> {
 
 export async function fetchChangeForm(): Promise<type.changeForm> {
     try {
-
+        const target = (await db.select().from(toBeReviewed).orderBy(toBeReviewed.time).limit(1))[0]
+        const status = await db.select({status: toBeReviewedStatus.status}).from(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, target.bikeId), eq(toBeReviewedStatus.time, target.time)))
+        const proofMaterials = await db.select({proofMaterial: toBeReviewedProofMaterial.proofMaterial}).from(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, target.bikeId), eq(toBeReviewedProofMaterial.time, target.time)))
+        return {
+            bike_id: target.bikeId,
+            time:target.time,
+            status: status.map((status) => status.status),
+            proofMaterial: proofMaterials.map((proofMaterial) => proofMaterial.proofMaterial),
+        }
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch changeForm')
     }
-    return any
 }
 
-export async function fetchSchedulingHistory(bikeId:string): Promise<type.schedulingHistory[]> {
+export async function fetchSchedulingHistory(bikeId: string): Promise<type.schedulingHistory[]> {
     try {
         return await db.select({
-            time:scheduling.time,
-            coordinate:scheduling.coordinate,
-            action:scheduling.action
-        }).from(scheduling).where(eq(scheduling.bikeId,bikeId)).orderBy(scheduling.time)
+            time: scheduling.time,
+            coordinate: scheduling.coordinate,
+            action: scheduling.action
+        }).from(scheduling).where(eq(scheduling.bikeId, bikeId)).orderBy(scheduling.time)
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch scheduling history')
     }
 }
 
-export async function fetchBikeList(): Promise<{bikeId:string}[]> {
+export async function fetchBikeList(): Promise<{ bikeId: string }[]> {
     try {
-        return await db.select({bikeId:bike.bikeId}).from(bike)
+        return await db.select({bikeId: bike.bikeId}).from(bike)
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch scheduling history')
