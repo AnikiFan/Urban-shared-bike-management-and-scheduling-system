@@ -13,7 +13,7 @@ export default async function withStatisticsLayout({children}: {children: React.
         },
         {
             title:'#Normal',
-            description:'状态正常',
+            description:'正常',
             statistics: bikeStatistics.normalNum,
             percentage:bikeStatistics.normalNum/bikeStatistics.bikeNum
         },

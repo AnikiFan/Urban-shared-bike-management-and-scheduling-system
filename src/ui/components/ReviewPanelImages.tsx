@@ -1,28 +1,37 @@
 'use client'
-import {Button, Pagination, Image} from "@nextui-org/react";
+import {Pagination, Image, Card, CardHeader, Divider, CardBody} from "@nextui-org/react";
 import React from "react";
-import {changeForm} from "@/lib/definition";
+import {bikeImages} from "@/lib/definition";
 
-export default function ({changeForm}: { changeForm: changeForm }) {
+export default function ({bikeImages}: { bikeImages: bikeImages }) {
+    const [currentImage, setCurrentImage] = React.useState(1);
     return (
-        <div className="flex flex-col  place-items-center justify-end flex-grow space-y-4 h-full">
-            <div className='basis-9/12 flex justify-center items-center'>
-                <Image
-                    isZoomed
-                    alt="NextUI hero Image"
-                    src={`data:image/jpg;base64, ${changeForm.proofMaterial[0]}`}
-                    className="justify-self-center basis-9/12"
-                />
+        <>
+            <div className='basis-10/12 flex justify-center items-center'>
+                <Card className="size-full">
+                    <CardHeader className="p-4">
+                        <strong>
+                            BikeID: {bikeImages.bikeId}
+                        </strong>
+                    </CardHeader>
+                    <Divider/>
+                    <CardBody className="flex-1 flex justify-center items-center p-4">
+                        <Image
+                            isZoomed
+                            alt="Proof Material"
+                            src={`data:image/jpg;base64, ${bikeImages.images[currentImage - 1]}`}
+                        />
+                    </CardBody>
+                </Card>
             </div>
-            <Pagination initialPage={1} total={10} size='lg' className='basis-1/12'/>
-            <div className="flex flex-row space-x-4 w-full place-content-center place-items-center basis-2/12">
-                <Button size='lg'>
-                    Button1
-                </Button>
-                <Button size='lg'>
-                    Button1
-                </Button>
-            </div>
-        </div>
+            <Pagination
+                initialPage={1}
+                total={bikeImages.images.length}
+                size='lg'
+                className='basis-1/12 justify-end justify-items-end'
+                onChange={(value) => setCurrentImage(value)}
+                siblings={10}
+            />
+        </>
     )
 }

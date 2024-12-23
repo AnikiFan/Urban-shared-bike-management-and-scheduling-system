@@ -13,7 +13,7 @@ import {
     toBeReviewedStatus,
     usage
 } from "@/db/schema";
-import {and, count, eq, gte, lt, sql} from "drizzle-orm";
+import {and, count, desc, eq, gte, lt, sql} from "drizzle-orm";
 import {changeForm, datetimeRange} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
 
@@ -44,9 +44,23 @@ export async function pushParkingAreaInfo(parkingAreaInfo: type.parkingAreaInfo)
     }
 }
 
-export async function pushChangeForm(changeForm: type.changeForm) {
+export async function pushChangeForm({bikeId, status}: { bikeId: string, status: string[] }) {
     try {
+        await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
+        await db.insert(bikeStatus).values(status.map((status) => {
+            return {bikeId: bikeId, status: status}
+        }))
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push changeForm')
+    }
+}
 
+export async function deleteReviewMaterials({bikeId, time}: { bikeId: string, time: string }) {
+    try {
+        await db.delete(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, bikeId), eq(toBeReviewedStatus.time, time)));
+        await db.delete(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, bikeId), eq(toBeReviewedProofMaterial.time, time)));
+        await db.delete(toBeReviewed).where(and(eq(toBeReviewed.bikeId, bikeId), eq(toBeReviewed.time, time)));
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push changeForm')
@@ -64,12 +78,11 @@ export async function pushSchedulingLog(schedulingLog: type.schedulingLog) {
 
 export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
     try {
-        const result = await db.select({
+        return await db.select({
             name: parkingArea.name,
             coordinate: parkingArea.coordinate,
             radius: parkingArea.radius,
         }).from(parkingArea)
-        return result;
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch parking area')
@@ -78,12 +91,11 @@ export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
 
 export async function fetchMapData(): Promise<type.mapData[]> {
     try {
-        const result = await db.select({
+        return await db.select({
             bikeId: bike.bikeId,
             status: bikeStatus.status,
             coordinate: bike.coordinate
         }).from(bike).leftJoin(bikeStatus, eq(bike.bikeId, bikeStatus.bikeId))
-        return result;
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch map data')
@@ -115,8 +127,7 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
 export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type.usage[]> {
     try {
         const {start, end} = datetimeRange
-        const result = await db.select().from(usage).where(and(gte(usage.time, toPostgreTimestamp(start)), lt(usage.time, toPostgreTimestamp(end))))
-        return result
+        return await db.select().from(usage).where(and(gte(usage.time, toPostgreTimestamp(start)), lt(usage.time, toPostgreTimestamp(end))))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch usage data')
@@ -133,14 +144,18 @@ export async function fetchBikeStatus(): Promise<type.bikeStatus> {
     return any
 }
 
-export async function fetchPreviousStatus(): Promise<type.previousStatus> {
+export async function fetchPreviousStatus(bikeId: string): Promise<type.previousStatus> {
     try {
-
+        const status = await db.select({status: bikeStatus.status}).from(bikeStatus).where(eq(bikeStatus.bikeId, bikeId))
+        const lastUsedTime = await db.select({lastUsedTime: usage.time}).from(usage).where(eq(usage.bikeId, bikeId)).orderBy(usage.time).limit(1)
+        return {
+            lastUsedTime: lastUsedTime[0].lastUsedTime,
+            status: status.map((status) => status.status)
+        }
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch previous status')
     }
-    return any
 }
 
 export async function fetchUpdatedBikeStatus(): Promise<type.updatedBikeStatus> {
@@ -170,7 +185,7 @@ export async function fetchChangeForm(): Promise<type.changeForm> {
         const proofMaterials = await db.select({proofMaterial: toBeReviewedProofMaterial.proofMaterial}).from(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, target.bikeId), eq(toBeReviewedProofMaterial.time, target.time)))
         return {
             bike_id: target.bikeId,
-            time:target.time,
+            time: target.time,
             status: status.map((status) => status.status),
             proofMaterial: proofMaterials.map((proofMaterial) => proofMaterial.proofMaterial),
         }

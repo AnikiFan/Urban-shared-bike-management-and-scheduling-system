@@ -58,7 +58,7 @@ export type uploadedData={
 
 //previous status
 export type previousStatus={
-    status:typeof bikeStatus.$inferInsert.status
+    status:typeof bikeStatus.$inferInsert.status[]
     lastUsedTime:typeof usage.$inferInsert.time
 };
 
@@ -83,11 +83,6 @@ export type uploadedUsageData={
     coordinate: typeof usage.$inferInsert.coordinate,
     time: typeof usage.$inferInsert.time,
     action: typeof usage.$inferInsert.action
-};
-
-//bike status statistics
-export type bikeStatusStatistics={
-
 };
 
 //time period
@@ -116,6 +111,9 @@ export type bikeStatistics={
     inStorageNum: number,
 };
 
+export type bikeStatusName = '正常'|'违规停放'|'低电量'|'闲置'|'长期未关锁'|'异常'|'待维修'|'型号老旧'|'库存';
+
+
 export type cardInfo={
     title:string,
     description:string,
@@ -142,4 +140,9 @@ export type usage={
     time:typeof usage.$inferInsert.time,
     coordinate:typeof usage.$inferInsert.coordinate,
     action:typeof usage.$inferInsert.action,
+}
+
+export type bikeImages={
+    bikeId:string,
+    images:string[]
 }

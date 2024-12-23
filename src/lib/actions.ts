@@ -1,6 +1,7 @@
 'use server'
-import {fetchUsageData,fetchBikeList,fetchSchedulingHistory} from "@/lib/dal";
-import {datetimeRange,usageData,usage,requiredSchedulingHistory} from "@/lib/definition";
+import {fetchUsageData, fetchBikeList, fetchSchedulingHistory, pushChangeForm, deleteReviewMaterials} from "@/lib/dal";
+import {datetimeRange, usageData, usage, requiredSchedulingHistory, changeForm} from "@/lib/definition";
+import {revalidatePath} from "next/cache";
 export async function getUsageData(datetimeRange:datetimeRange){
     const usage =await fetchUsageData(datetimeRange);
     const usageGroup: Record<string, usage[]> = usage.reduce((acc, record) => {
@@ -54,4 +55,15 @@ export async function getSchedulingHistory(bikeId:string){
         }
     }
     return result
+}
+
+export async function acceptChangeForm({bikeId,time,status}:{bikeId:string,time:string,status:string[]}){
+    await pushChangeForm({bikeId,status});
+    await deleteReviewMaterials({bikeId:bikeId,time:time});
+    revalidatePath('/dashboard/reviewPanel')
+}
+
+export async function rejectChangeForm({bikeId,time}:{bikeId:string,time:string}){
+    await deleteReviewMaterials({bikeId:bikeId,time:time});
+    revalidatePath('/dashboard/reviewPanel')
 }

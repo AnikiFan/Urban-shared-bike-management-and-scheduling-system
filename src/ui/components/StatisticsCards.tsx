@@ -1,6 +1,7 @@
 'use client'
 import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, card} from "@nextui-org/react";
-import {cardInfo} from "@/lib/definition";
+import {bikeStatusName, cardInfo} from "@/lib/definition";
+import {palette} from "@/lib/const";
 
 export default function ({cardInfo}: { cardInfo: cardInfo[] }) {
     return (
@@ -12,7 +13,7 @@ export default function ({cardInfo}: { cardInfo: cardInfo[] }) {
 
 function MyCard({cardInfo}: { cardInfo: cardInfo }) {
     return (
-        <Card >
+        <Card className={`${palette[cardInfo.description as bikeStatusName]}-200 shadow-lg`}>
             <CardHeader className="flex gap-3">
                 <div className="flex flex-col">
                     <p className="text-lg ">{cardInfo.title}</p>
