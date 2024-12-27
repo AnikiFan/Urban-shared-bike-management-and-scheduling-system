@@ -1,5 +1,5 @@
 import {Metadata} from "next";
-import DistributionMap from "@/ui/maps/DistributionMap";
+import DistributionMap from "@/ui/components/maps/DistributionMap";
 import {fetchMapData,fetchParkingAreaInfo} from "@/lib/dal";
 
 export const metadata: Metadata = {

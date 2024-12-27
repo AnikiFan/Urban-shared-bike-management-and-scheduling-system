@@ -1,5 +1,5 @@
 import {CardBody,Card,CardHeader,Divider} from "@nextui-org/react";
-import LoginForm from "@/ui/components/LoginForm";
+import LoginForm from "@/ui/components/login/LoginForm";
 import {sans} from "@/ui/fonts";
 
 

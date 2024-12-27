@@ -5,7 +5,7 @@ import {Map, NavigationControl, Popup, useControl} from 'react-map-gl';
 import {GeoJsonLayer, ArcLayer, DeckProps} from 'deck.gl';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import {useSelected} from "@/ui/components/SelectContext";
+import {useSelected} from "@/ui/components/scheduleMapl/SelectContext";
 import {getSchedulingHistory} from "@/lib/actions";
 import {requiredSchedulingHistory, schedulingData} from "@/lib/definition";
 import {usageColor} from "@/lib/utils";
@@ -27,6 +27,7 @@ const INITIAL_VIEW_STATE = {
 const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 function DeckGLOverlay(props: DeckProps) {
+    // @ts-ignore
     const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
     overlay.setProps(props);
     return null;
@@ -42,8 +43,8 @@ export default function UsageMap() {
             data: scheduleHistory,
             getSourcePosition:(d:requiredSchedulingHistory)=>d.startCoordinate,
             getTargetPosition:(d:requiredSchedulingHistory)=>d.endCoordinate,
-            getSourceColor:(d:requiredSchedulingHistory)=>usageColor(d.startTime),
-            getTargetColor:(d:requiredSchedulingHistory)=>usageColor(d.endTime),
+            getSourceColor:(d:requiredSchedulingHistory)=>usageColor(d.startTime as string),
+            getTargetColor:(d:requiredSchedulingHistory)=>usageColor(d.endTime as string),
             getWidth:10
         })
     ];

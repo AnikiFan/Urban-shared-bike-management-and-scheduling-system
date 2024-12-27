@@ -1,4 +1,4 @@
-import Logo from '@/ui/components/Logo';
+import Logo from '@/ui/components/layout/Logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import {sans} from "@/ui/fonts";
@@ -22,7 +22,6 @@ export default function () {
           </Link>
         </div>
         <div className="flex items-center justify-center p-6 w-3/5 px-28 py-12">
-            <Image src="/hero-desktop.png" alt="Screenshots" className="hidden md:block" width={1000} height={760} />
         </div>
       </div>
     </main>

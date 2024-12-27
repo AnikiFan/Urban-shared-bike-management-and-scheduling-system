@@ -1,10 +1,10 @@
 'use client'
 import ScheduleSelector from "./ScheduleSelector";
 import {useEffect,useState} from "react";
-import {useSelected} from "@/ui/components/SelectContext";
+import {useSelected} from "@/ui/components/scheduleMapl/SelectContext";
 import {getSchedulingHistory} from "@/lib/actions";
 import {requiredSchedulingHistory} from "@/lib/definition";
-import ExportButton from "@/ui/components/ExportButton";
+import ExportButton from "@/ui/components/scheduleMapl/ExportButton";
 
 export default function () {
     const [schedulingHistory, setSchedulingHistory] = useState<requiredSchedulingHistory[]>([])

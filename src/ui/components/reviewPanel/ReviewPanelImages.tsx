@@ -1,10 +1,11 @@
 'use client'
 import {Pagination, Image, Card, CardHeader, Divider, CardBody} from "@nextui-org/react";
-import React from "react";
+import React, {useEffect} from "react";
 import {bikeImages} from "@/lib/definition";
 
 export default function ({bikeImages}: { bikeImages: bikeImages }) {
     const [currentImage, setCurrentImage] = React.useState(1);
+    useEffect(()=>setCurrentImage(1),[bikeImages])
     return (
         <>
             <div className='basis-10/12 flex justify-center items-center'>
@@ -28,6 +29,7 @@ export default function ({bikeImages}: { bikeImages: bikeImages }) {
                 initialPage={1}
                 total={bikeImages.images.length}
                 size='lg'
+                page={currentImage}
                 className='basis-1/12 justify-end justify-items-end'
                 onChange={(value) => setCurrentImage(value)}
                 siblings={10}

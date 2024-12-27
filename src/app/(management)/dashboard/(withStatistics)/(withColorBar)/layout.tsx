@@ -1,5 +1,5 @@
 import React from 'react'
-import ColorBar from "@/ui/components/ColorBar";
+import ColorBar from "@/ui/components/layout/ColorBar";
 
 export default async function ({children}: { children: React.ReactNode }) {
     return (

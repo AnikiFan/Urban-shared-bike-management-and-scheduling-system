@@ -4,7 +4,7 @@ import React, {createContext, useContext,useState} from 'react'
 
 const SelectedDispatchContext = createContext<{
     setSelected:React.Dispatch<React.SetStateAction<string>>
-}>(undefined);
+}|null>(null);
 
 const SelectedContext = createContext<string>('');
 

@@ -29,12 +29,6 @@ export type changeForm={
     proofMaterial:typeof toBeReviewedProofMaterial.$inferInsert.proofMaterial[]
 };
 
-// comment
-export type comment={
-    reply:boolean
-};
-
-
 // bike status,updated bike status
 export type bikeStatus={
     status:typeof bikeStatus.$inferInsert.status
@@ -112,6 +106,12 @@ export type bikeStatistics={
 };
 
 export type bikeStatusName = '正常'|'违规停放'|'低电量'|'闲置'|'长期未关锁'|'异常'|'待维修'|'型号老旧'|'库存';
+
+export type bikeBasic = {
+    bikeId:typeof bike.$inferInsert.bikeId,
+    batteryRemainingCapacity: typeof bike.$inferInsert.batteryRemainingCapacity,
+    productionDate: typeof bike.$inferInsert.productionDate,
+}
 
 
 export type cardInfo={

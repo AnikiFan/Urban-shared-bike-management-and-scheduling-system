@@ -1,8 +1,8 @@
 'use client'
-import ScheduleMap from "@/ui/maps/ScheduleMap";
-import ScheduleSelectBar from "@/ui/components/ScheduleSelectBar";
+import ScheduleMap from "@/ui/components/maps/ScheduleMap";
+import ScheduleSelectBar from "@/ui/components/scheduleMapl/ScheduleSelectBar";
 import React, {useState} from "react";
-import SelectContext from "@/ui/components/SelectContext";
+import SelectContext from "@/ui/components/scheduleMapl/SelectContext";
 
 
 export default function ScheduleMapPage() {

@@ -1,7 +1,7 @@
-import NavLinks from '@/ui/components/NavLinks';
+import NavLinks from '@/ui/components/layout/NavLinks';
 import {sans} from "@/ui/fonts";
 import {BikeLogo} from "@/ui/icons";
-import LogoutButton from "@/ui/components/LogoutButton";
+import LogoutButton from "@/ui/components/layout/LogoutButton";
 
 export default function () {
     return (

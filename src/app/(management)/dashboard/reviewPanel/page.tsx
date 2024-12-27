@@ -1,11 +1,17 @@
 import React from 'react';
 import {Divider} from "@nextui-org/react";
 import {fetchChangeForm,fetchPreviousStatus} from "@/lib/dal";
-import ReviewPanelImages from "@/ui/components/ReviewPanelImages";
-import ReviewPanelButton from "@/ui/components/ReviewPanelButton";
-import ReviewPanelChipCard from "@/ui/components/ReviewPanelChipCard";
+import ReviewPanelImages from "@/ui/components/reviewPanel/ReviewPanelImages";
+import ReviewPanelButton from "@/ui/components/reviewPanel/ReviewPanelButton";
+import ReviewPanelChipCard from "@/ui/components/reviewPanel/ReviewPanelChipCard";
+import {getSession} from "@/lib/auth";
+import {unauthorized} from "next/navigation";
 
 export default async function ReviewPanelPage() {
+    const session = await getSession()
+    if(session.user.role != 'MANAGER'){
+        unauthorized();
+    }
     const changeForm = await fetchChangeForm();
     const previousStatus = await fetchPreviousStatus(changeForm.bike_id);
     return (

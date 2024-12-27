@@ -14,7 +14,7 @@ export default function ({children}: { children: React.ReactNode; })
 {
     return (
         <html lang="zh-cn">
-        <body className={`light ${serif.className} antialiased`}>
+        <body className={`${serif.className} antialiased h-screen`}>
         <Providers>
             {children}
         </Providers>

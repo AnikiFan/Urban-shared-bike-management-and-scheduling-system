@@ -1,18 +1,11 @@
 'use client'
-import React, {useState} from 'react';
+import React from 'react';
 import MapWrapper from './MapWrapper';
-import {Map, NavigationControl, Popup, useControl} from 'react-map-gl';
-import {GeoJsonLayer, ArcLayer, DeckProps, ScatterplotLayer, HeatmapLayer,IconLayer} from 'deck.gl';
+import {Map, NavigationControl, useControl} from 'react-map-gl';
+import {DeckProps, ScatterplotLayer, HeatmapLayer,IconLayer} from 'deck.gl';
 import {MapboxOverlay} from '@deck.gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {mapData,parkingAreaInfo} from "@/lib/definition";
-
-// source: Natural Earth http://www.naturalearthdata.com/ via geojson.xyz
-const AIR_PORTS =
-    'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_airports.geojson';
-
-// Set your Mapbox token here or via environment variable
-// const MAPBOX_TOKEN = "pk.eyJ1IjoidnY4ejg2IiwiYSI6ImNtNGVxdXc0ODEyMnIyanEweHdwZzF0b2kifQ.B5Num2zwPZCsKSGqu07iqQ"; // eslint-disable-line
 
 const INITIAL_VIEW_STATE = {
     latitude: 31.251180073866866,
@@ -25,13 +18,13 @@ const INITIAL_VIEW_STATE = {
 const MAP_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 function DeckGLOverlay(props: DeckProps) {
+    // @ts-ignore
     const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
     overlay.setProps(props);
     return null;
 }
 
 export default function ({mapData,parkingAreaInfo}:{mapData:mapData[],parkingAreaInfo:parkingAreaInfo[]}) {
-    const [selected, setSelected] = useState(null);
     const layers = [
         new ScatterplotLayer<mapData>({
             id: 'bikeScatterPlot',
@@ -62,7 +55,7 @@ export default function ({mapData,parkingAreaInfo}:{mapData:mapData[],parkingAre
             getColor:[0,140,255],
             getSize:20,
             sizeMinPixels:10,
-            getIcon:(d:parkingAreaInfo)=>'marker',
+            getIcon:()=>'marker',
             iconAtlas: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.png',
             iconMapping: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/icon-atlas.json',
             pickable:true
@@ -84,17 +77,6 @@ export default function ({mapData,parkingAreaInfo}:{mapData:mapData[],parkingAre
                 mapStyle={MAP_STYLE}
                 mapboxAccessToken={'pk.eyJ1IjoidnY4ejg2IiwiYSI6ImNtNGVxdXc0ODEyMnIyanEweHdwZzF0b2kifQ.B5Num2zwPZCsKSGqu07iqQ'}
             >
-                {selected && (
-                    <Popup
-                        key={selected.properties.name}
-                        anchor="bottom"
-                        style={{zIndex: 10}} /* position above deck.gl canvas */
-                        longitude={selected.geometry.coordinates[0]}
-                        latitude={selected.geometry.coordinates[1]}
-                    >
-                        {selected.properties.name} ({selected.properties.abbrev})
-                    </Popup>
-                )}
                 <DeckGLOverlay layers={layers} /* interleaved*/ />
                 <NavigationControl position="top-left"/>
             </Map>

@@ -2,7 +2,6 @@ import 'server-only'
 import * as model from '@/db/schema'
 import * as type from '@/lib/definition'
 import {db} from '@/db/index'
-import {users} from "@/drizzle/schema";
 import {
     bike,
     bikeStatus,
@@ -13,20 +12,49 @@ import {
     toBeReviewedStatus,
     usage
 } from "@/db/schema";
-import {and, count, desc, eq, gte, lt, sql} from "drizzle-orm";
-import {changeForm, datetimeRange} from "@/lib/definition";
+import {and, count, desc, eq, gte, inArray, like, lt, or, sql} from "drizzle-orm";
+import {changeForm, datetimeRange, parkingAreaInfo} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
+import {cacheTag} from "next/dist/server/use-cache/cache-tag";
+import {getSession} from "@/lib/auth";
+import {unauthorized} from "next/navigation";
 
 export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsageData) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
 
     } catch (error) {
         console.log('Database Error', error)
-        throw new Error('Fail to fetch uploaded usage data')
+        throw new Error('Fail to push uploaded usage data')
+    }
+}
+
+export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeInfo)  {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        db.insert(bike).values({
+            bikeId:bikeId,
+            coordinate:coordinate,
+            productionDate:productionDate,
+            batteryRemainingCapacity:1.0
+        })
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push bike info')
     }
 }
 
 export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeInfo) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
 
     } catch (error) {
@@ -35,9 +63,13 @@ export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeIn
     }
 }
 
-export async function pushParkingAreaInfo(parkingAreaInfo: type.parkingAreaInfo) {
+export async function pushParkingAreaInfo({name,coordinate,radius}: type.parkingAreaInfo) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
-
+        await db.insert(parkingArea).values({name:name,coordinate:coordinate,radius:radius});
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push parking area')
@@ -45,8 +77,13 @@ export async function pushParkingAreaInfo(parkingAreaInfo: type.parkingAreaInfo)
 }
 
 export async function pushChangeForm({bikeId, status}: { bikeId: string, status: string[] }) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
+        // @ts-ignore
         await db.insert(bikeStatus).values(status.map((status) => {
             return {bikeId: bikeId, status: status}
         }))
@@ -56,18 +93,136 @@ export async function pushChangeForm({bikeId, status}: { bikeId: string, status:
     }
 }
 
+export async function updateParkingArea({name,coordinate,radius,parkingAreaId}: type.parkingAreaInfo & {parkingAreaId:number}) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.update(parkingArea).set({name:name,coordinate: coordinate,radius:radius}).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)));
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push parking area')
+    }
+}
+
+
+export async function updateBike({bikeId,productionDate,batteryRemainingCapacity,status}:{bikeId:string,productionDate:string,batteryRemainingCapacity:number,status:string[]}) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.update(bike).set({productionDate:productionDate,batteryRemainingCapacity:batteryRemainingCapacity}).where(eq(bike.bikeId,bikeId));
+        await db.delete(bikeStatus).where(eq(bikeStatus.bikeId,bikeId));
+        // @ts-ignore
+        await db.insert(bikeStatus).values(status.map((status) => {
+            return {bikeId: bikeId, status: status}
+        }))
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push parking area')
+    }
+}
+
+export async function updateLowBattery(threshold:number){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.execute(sql`SELECT mark_low_battery(${threshold})`)
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to update Low Battery')
+    }
+}
+
+export async function updateIdle(threshold:number){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.execute(sql`SELECT mark_idle_bikes(${threshold})`)
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to update Idle')
+    }
+}
+
+export async function updateLUFLT(threshold:number){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.execute(sql`SELECT update_luflt_status(${threshold})`)
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to update LUFLT')
+    }
+}
+
+export async function updateOutdated(threshold:string){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.execute(sql`SELECT update_outdated_status(${threshold})`)
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to update Outdated')
+    }
+}
+
 export async function deleteReviewMaterials({bikeId, time}: { bikeId: string, time: string }) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         await db.delete(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, bikeId), eq(toBeReviewedStatus.time, time)));
         await db.delete(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, bikeId), eq(toBeReviewedProofMaterial.time, time)));
         await db.delete(toBeReviewed).where(and(eq(toBeReviewed.bikeId, bikeId), eq(toBeReviewed.time, time)));
     } catch (error) {
         console.log('Database Error', error)
-        throw new Error('Fail to push changeForm')
+        throw new Error('Fail to delete review material')
+    }
+}
+
+export async function deleteBike(bikeId:string){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.delete(bike).where(eq(bike.bikeId,bikeId))
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to delete bike')
+    }
+}
+
+export async function deleteParkingArea(parkingAreaId:number){
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.delete(parkingArea).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)));
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to delete parking area')
     }
 }
 
 export async function pushSchedulingLog(schedulingLog: type.schedulingLog) {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
 
     } catch (error) {
@@ -77,6 +232,10 @@ export async function pushSchedulingLog(schedulingLog: type.schedulingLog) {
 }
 
 export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         return await db.select({
             name: parkingArea.name,
@@ -90,6 +249,10 @@ export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
 }
 
 export async function fetchMapData(): Promise<type.mapData[]> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         return await db.select({
             bikeId: bike.bikeId,
@@ -103,6 +266,10 @@ export async function fetchMapData(): Promise<type.mapData[]> {
 }
 
 export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         const bikeNum = (await db.select({count: count()}).from(bike))[0].count
         const bikeStatistics = await db.select({count: count()}).from(bikeStatus).groupBy(bikeStatus.status)
@@ -125,6 +292,10 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
 }
 
 export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type.usage[]> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         const {start, end} = datetimeRange
         return await db.select().from(usage).where(and(gte(usage.time, toPostgreTimestamp(start)), lt(usage.time, toPostgreTimestamp(end))))
@@ -134,17 +305,11 @@ export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type
     }
 }
 
-export async function fetchBikeStatus(): Promise<type.bikeStatus> {
-    try {
-
-    } catch (error) {
-        console.log('Database Error', error)
-        throw new Error('Fail to fetch bike status')
-    }
-    return any
-}
-
 export async function fetchPreviousStatus(bikeId: string): Promise<type.previousStatus> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         const status = await db.select({status: bikeStatus.status}).from(bikeStatus).where(eq(bikeStatus.bikeId, bikeId))
         const lastUsedTime = await db.select({lastUsedTime: usage.time}).from(usage).where(eq(usage.bikeId, bikeId)).orderBy(usage.time).limit(1)
@@ -158,27 +323,27 @@ export async function fetchPreviousStatus(bikeId: string): Promise<type.previous
     }
 }
 
-export async function fetchUpdatedBikeStatus(): Promise<type.updatedBikeStatus> {
-    try {
-
-    } catch (error) {
-        console.log('Database Error', error)
-        throw new Error('Fail to fetch updated bike status')
+export async function fetchBikeInfo(bikeId:string): Promise<{basic:type.bikeBasic[],status:{bikeId:string,status:string}[]}> {
+    console.debug('fetch bikeInfo', bikeId)
+    const session = await getSession();
+    if(!session){
+        unauthorized()
     }
-    return any
-}
-
-export async function fetchBikeInfo(): Promise<type.bikeInfo> {
     try {
-
+        const basic = await db.select({bikeId:bike.bikeId,batteryRemainingCapacity:bike.batteryRemainingCapacity,productionDate:bike.productionDate}).from(bike).where(like(bike.bikeId, `${bikeId}%`))
+        const status = await db.select({bikeId:bikeStatus.bikeId,status:bikeStatus.status}).from(bikeStatus).where(inArray(bikeStatus.bikeId,basic.map((basic)=>basic.bikeId)))
+        return {basic:basic,status:status}
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch bike info')
     }
-    return any
 }
 
 export async function fetchChangeForm(): Promise<type.changeForm> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         const target = (await db.select().from(toBeReviewed).orderBy(toBeReviewed.time).limit(1))[0]
         const status = await db.select({status: toBeReviewedStatus.status}).from(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, target.bikeId), eq(toBeReviewedStatus.time, target.time)))
@@ -196,6 +361,10 @@ export async function fetchChangeForm(): Promise<type.changeForm> {
 }
 
 export async function fetchSchedulingHistory(bikeId: string): Promise<type.schedulingHistory[]> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         return await db.select({
             time: scheduling.time,
@@ -209,10 +378,31 @@ export async function fetchSchedulingHistory(bikeId: string): Promise<type.sched
 }
 
 export async function fetchBikeList(): Promise<{ bikeId: string }[]> {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
     try {
         return await db.select({bikeId: bike.bikeId}).from(bike)
     } catch (error) {
         console.log('Database Error', error)
-        throw new Error('Fail to fetch scheduling history')
+        throw new Error('Fail to fetch bike list')
+    }
+}
+
+export async function fetchParkingAreaList(parkingAreaId:string):Promise<(parkingAreaInfo&{parkingAreaId:number})[]>{
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        if(isNaN(Number(parkingAreaId))){
+            return await db.select().from(parkingArea).where(like(parkingArea.name,'%'+parkingAreaId+'%'))
+        }else{
+            return await db.select().from(parkingArea).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)))
+        }
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to fetch parking area info list')
     }
 }
