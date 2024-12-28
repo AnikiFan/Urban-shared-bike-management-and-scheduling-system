@@ -5,13 +5,25 @@ export type schedulingData={
     time:typeof scheduling.$inferInsert.time,
     action:typeof scheduling.$inferInsert.action
 };
-export type schedulingLog = schedulingData;
+export type schedulingLog = {
+    coordinate:typeof scheduling.$inferInsert.coordinate,
+    time:typeof scheduling.$inferInsert.time,
+    action:typeof scheduling.$inferInsert.action
+    bikeId:typeof scheduling.$inferInsert.bikeId
+};
 export type schedulingHistory = schedulingData;
 export type requiredSchedulingHistory ={
     startCoordinate:typeof usage.$inferInsert.coordinate,
     startTime:typeof usage.$inferInsert.time,
     endCoordinate:typeof usage.$inferInsert.coordinate,
     endTime:typeof usage.$inferInsert.time,
+};
+
+export type uploadedChangeForm = {
+    bikeId:typeof toBeReviewed.$inferInsert.bikeId,
+    time:typeof toBeReviewed.$inferInsert.time,
+    proofMaterials: typeof toBeReviewedProofMaterial.$inferInsert.proofMaterial[],
+    status:typeof toBeReviewedStatus.$inferInsert.status[],
 };
 
 // parking area info
@@ -89,7 +101,6 @@ export type timePeriod={
 export type uploadedBikeInfo={
     bikeId: typeof bike.$inferInsert.bikeId,
     batteryRemainingCapacity: typeof bike.$inferInsert.batteryRemainingCapacity,
-    status:typeof bikeStatus.$inferInsert.status
 };
 
 export type bikeStatistics={

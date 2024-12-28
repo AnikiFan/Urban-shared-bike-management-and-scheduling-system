@@ -25,7 +25,7 @@ export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsag
         unauthorized()
     }
     try {
-
+        await db.insert(usage).values(uploadedUsageData)
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push uploaded usage data')
@@ -38,7 +38,7 @@ export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeI
         unauthorized()
     }
     try {
-        db.insert(bike).values({
+        await db.insert(bike).values({
             bikeId:bikeId,
             coordinate:coordinate,
             productionDate:productionDate,
@@ -50,13 +50,54 @@ export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeI
     }
 }
 
+export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog)  {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.update(bike).set({coordinate:schedulingLog.coordinate}).where(eq(bike.bikeId,schedulingLog.bikeId))
+        await db.insert(scheduling).values({
+            bikeId:schedulingLog.bikeId,
+            coordinate:schedulingLog.coordinate,
+            action:schedulingLog.action,
+            time:schedulingLog.time,
+        })
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push scheduling log')
+    }
+}
+
+export async function pushUploadedChangeForm(uploadedChangeForm:type.uploadedChangeForm) {
+    await db.insert(toBeReviewed).values({bikeId:uploadedChangeForm.bikeId,time: uploadedChangeForm.time})
+    await db.insert(toBeReviewedStatus).values(uploadedChangeForm.status.map((status)=>{
+        return {
+            bikeId:uploadedChangeForm.bikeId,
+            time:uploadedChangeForm.time,
+            status:status,
+        }
+    }))
+    await db.insert(toBeReviewedProofMaterial).values(
+        uploadedChangeForm.proofMaterials.map((proofMaterial,idx)=>{
+            return {
+                no:idx,
+                bikeId:uploadedChangeForm.bikeId,
+                time:uploadedChangeForm.time,
+                proofMaterial:proofMaterial,
+            }
+        })
+    )
+}
+
+
 export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeInfo) {
     const session = await getSession();
     if(!session){
         unauthorized()
     }
     try {
-
+        await db.update(bike).set({batteryRemainingCapacity:uploadedBikeInfo.batteryRemainingCapacity}).where(eq(bike.bikeId,uploadedBikeInfo.bikeId))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push uploaded bike data')
