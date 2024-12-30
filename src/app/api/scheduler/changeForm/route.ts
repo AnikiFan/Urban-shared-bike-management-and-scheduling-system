@@ -1,6 +1,5 @@
 import {pushUploadedChangeForm, pushUploadedSchedulingLog} from "@/lib/dal";
 import {NextResponse} from "next/server";
-import {undefined} from "zod";
 
 export async function POST(request: Request) {
     const details = {
@@ -18,6 +17,7 @@ export async function POST(request: Request) {
                 bikeId:bikeID as string,
                 time:time as string,
                 proofMaterials:proofMaterials as string[],
+                // @ts-ignore
                 status:status as string[]
             })
             details.uploadedSchedulingLog.success = true;
