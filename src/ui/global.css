@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*input {*/
+/*    border: none;*/
+/*    outline: none;*/
+/*    box-shadow: none;*/
+/*}*/
+
+/*[type='text']:focus ,textarea:focus, select:focus{*/
+/*    --tw-ring-color: transparent;*/
+/*}*/

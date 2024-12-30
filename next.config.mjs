@@ -2,8 +2,9 @@
 
 const nextConfig = {
     experimental:{
-        ppr:'incremental'
-    }
+        ppr:'incremental',
+        authInterrupts:true
+    },
 };
 
 export default nextConfig;

@@ -20,7 +20,11 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/ui/*": ["./src/ui/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/db/*": ["./src/db/*"],
+      "@/auth/*": ["./src/app/auth/*"]
     }
   },
   "include": [
@@ -28,8 +32,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/lib/placeholder-data.ts",
-    "scripts/seed.js"
+    "lib/placeholder-data.ts",
+    "scripts/seed.js",
+    "ui/**/*",
+    "lib/**/*"
   ],
   "exclude": ["node_modules"]
 }
