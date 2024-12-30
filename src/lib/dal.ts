@@ -380,13 +380,16 @@ export async function fetchBikeInfo(bikeId:string): Promise<{basic:type.bikeBasi
     }
 }
 
-export async function fetchChangeForm(): Promise<type.changeForm> {
+export async function fetchChangeForm(): Promise<type.changeForm|null> {
     const session = await getSession();
     if(!session){
         unauthorized()
     }
     try {
         const target = (await db.select().from(toBeReviewed).orderBy(toBeReviewed.time).limit(1))[0]
+        if(target==undefined){
+            return null
+        }
         const status = await db.select({status: toBeReviewedStatus.status}).from(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, target.bikeId), eq(toBeReviewedStatus.time, target.time)))
         const proofMaterials = await db.select({proofMaterial: toBeReviewedProofMaterial.proofMaterial}).from(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, target.bikeId), eq(toBeReviewedProofMaterial.time, target.time)))
         return {
