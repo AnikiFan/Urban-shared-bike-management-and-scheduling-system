@@ -15,7 +15,6 @@ import {
 import {and, count, desc, eq, gte, inArray, like, lt, or, sql} from "drizzle-orm";
 import {changeForm, datetimeRange, parkingAreaInfo} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
-import {cacheTag} from "next/dist/server/use-cache/cache-tag";
 import {getSession} from "@/lib/auth";
 import {unauthorized} from "next/navigation";
 
@@ -56,38 +55,41 @@ export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog
         unauthorized()
     }
     try {
-        await db.update(bike).set({coordinate:schedulingLog.coordinate}).where(eq(bike.bikeId,schedulingLog.bikeId))
-        await db.insert(scheduling).values({
-            bikeId:schedulingLog.bikeId,
-            coordinate:schedulingLog.coordinate,
-            action:schedulingLog.action,
-            time:schedulingLog.time,
+        await db.transaction(async(tx) =>{
+            await db.update(bike).set({coordinate:schedulingLog.coordinate}).where(eq(bike.bikeId,schedulingLog.bikeId))
+            await db.insert(scheduling).values({
+                bikeId:schedulingLog.bikeId,
+                coordinate:schedulingLog.coordinate,
+                action:schedulingLog.action,
+                time:schedulingLog.time,
+            })
         })
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push scheduling log')
     }
 }
-
-export async function pushUploadedChangeForm(uploadedChangeForm:type.uploadedChangeForm) {
-    await db.insert(toBeReviewed).values({bikeId:uploadedChangeForm.bikeId,time: uploadedChangeForm.time})
-    await db.insert(toBeReviewedStatus).values(uploadedChangeForm.status.map((status)=>{
-        return {
-            bikeId:uploadedChangeForm.bikeId,
-            time:uploadedChangeForm.time,
-            status:status,
-        }
-    }))
-    await db.insert(toBeReviewedProofMaterial).values(
-        uploadedChangeForm.proofMaterials.map((proofMaterial,idx)=>{
-            return {
-                no:idx,
-                bikeId:uploadedChangeForm.bikeId,
-                time:uploadedChangeForm.time,
-                proofMaterial:proofMaterial,
-            }
-        })
-    )
+ export async function pushUploadedChangeForm(uploadedChangeForm:type.uploadedChangeForm) {
+    await db.transaction(async(tx)=>{
+         await db.insert(toBeReviewed).values({bikeId:uploadedChangeForm.bikeId,time: uploadedChangeForm.time})
+         await db.insert(toBeReviewedStatus).values(uploadedChangeForm.status.map((status)=>{
+             return {
+                 bikeId:uploadedChangeForm.bikeId,
+                 time:uploadedChangeForm.time,
+                 status:status,
+             }
+         }))
+         await db.insert(toBeReviewedProofMaterial).values(
+             uploadedChangeForm.proofMaterials.map((proofMaterial,idx)=>{
+                 return {
+                     no:idx,
+                     bikeId:uploadedChangeForm.bikeId,
+                     time:uploadedChangeForm.time,
+                     proofMaterial:proofMaterial,
+                 }
+             })
+         )
+     })
 }
 
 
@@ -123,11 +125,13 @@ export async function pushChangeForm({bikeId, status}: { bikeId: string, status:
         unauthorized()
     }
     try {
-        await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
-        // @ts-ignore
-        await db.insert(bikeStatus).values(status.map((status) => {
-            return {bikeId: bikeId, status: status}
-        }))
+        await db.transaction(async(tx)=>{
+            await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
+            // @ts-ignore
+            await db.insert(bikeStatus).values(status.map((status) => {
+                return {bikeId: bikeId, status: status}
+            }))
+        })
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push changeForm')
@@ -154,12 +158,14 @@ export async function updateBike({bikeId,productionDate,batteryRemainingCapacity
         unauthorized()
     }
     try {
-        await db.update(bike).set({productionDate:productionDate,batteryRemainingCapacity:batteryRemainingCapacity}).where(eq(bike.bikeId,bikeId));
-        await db.delete(bikeStatus).where(eq(bikeStatus.bikeId,bikeId));
-        // @ts-ignore
-        await db.insert(bikeStatus).values(status.map((status) => {
-            return {bikeId: bikeId, status: status}
-        }))
+        await db.transaction(async(tx)=>{
+            await db.update(bike).set({productionDate:productionDate,batteryRemainingCapacity:batteryRemainingCapacity}).where(eq(bike.bikeId,bikeId));
+            await db.delete(bikeStatus).where(eq(bikeStatus.bikeId,bikeId));
+            // @ts-ignore
+            await db.insert(bikeStatus).values(status.map((status) => {
+                return {bikeId: bikeId, status: status}
+            }))
+        })
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push parking area')
@@ -224,9 +230,11 @@ export async function deleteReviewMaterials({bikeId, time}: { bikeId: string, ti
         unauthorized()
     }
     try {
-        await db.delete(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, bikeId), eq(toBeReviewedStatus.time, time)));
-        await db.delete(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, bikeId), eq(toBeReviewedProofMaterial.time, time)));
-        await db.delete(toBeReviewed).where(and(eq(toBeReviewed.bikeId, bikeId), eq(toBeReviewed.time, time)));
+        await db.transaction(async(tx)=>{
+            await db.delete(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, bikeId), eq(toBeReviewedStatus.time, time)));
+            await db.delete(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, bikeId), eq(toBeReviewedProofMaterial.time, time)));
+            await db.delete(toBeReviewed).where(and(eq(toBeReviewed.bikeId, bikeId), eq(toBeReviewed.time, time)));
+        })
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to delete review material')
@@ -256,19 +264,6 @@ export async function deleteParkingArea(parkingAreaId:number){
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to delete parking area')
-    }
-}
-
-export async function pushSchedulingLog(schedulingLog: type.schedulingLog) {
-    const session = await getSession();
-    if(!session){
-        unauthorized()
-    }
-    try {
-
-    } catch (error) {
-        console.log('Database Error', error)
-        throw new Error('Fail to push scheduling log')
     }
 }
 

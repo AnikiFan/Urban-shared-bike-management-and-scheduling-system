@@ -6,19 +6,11 @@ export async function POST(request: NextRequest) {
         uploadedSchedulingLog: {success: false, error: ''},
     };
     try {
-
         const formData = await request.formData()
         const bikeID = formData.get('bike_id')
         const proofMaterials = formData.getAll('proof_materials')
         const status = formData.getAll('status')
         const time = formData.get('time')
-        console.log({
-                bikeId:bikeID as string,
-                time:time as string,
-                proofMaterials:proofMaterials as string[],
-                // @ts-ignore
-                status:status as string[]
-            })
         try {
             await pushUploadedChangeForm({
                 bikeId:bikeID as string,

@@ -11,12 +11,6 @@ export async function POST(request: NextRequest) {
         const action = Boolean(formData.get('action'));
         const coordinate = JSON.parse(formData.get('coordinate') as string);
         const time = formData.get('time');
-        console.log({
-                action: action,
-                bikeId: bikeID as string,
-                coordinate: coordinate as [number, number],
-                time: time as string,
-            })
         try {
             await pushUploadedSchedulingLog({
                 action: action,
