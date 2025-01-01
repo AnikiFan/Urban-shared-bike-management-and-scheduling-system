@@ -17,16 +17,6 @@ export async function POST(request: NextRequest) {
     };
     try {
         await db.transaction(async (tx) => {
-            console.log({
-                bikeId: bikeID as string,
-                coordinate: coordinate as [number, number],
-                time: time as string,
-                action: action,
-            })
-            console.log({
-                bikeId: bikeID as string,
-                batteryRemainingCapacity: remainBatteryCapacity,
-            })
             try {
                 await pushUploadedUsageData({
                     bikeId: bikeID as string,
@@ -51,15 +41,12 @@ export async function POST(request: NextRequest) {
             if(!allSuccessful){
                 tx.rollback()
             }
-            return NextResponse.json({
-                success: allSuccessful,
-                details,
-            }, {status: allSuccessful ? 200 : 207});
         })
+        const allSuccessful = details.uploadedUsageData.success && details.uploadedBikeInfo.success;
         return NextResponse.json({
-            success: false,
+            success: allSuccessful,
             details,
-        }, {status: 207});
+        }, {status: allSuccessful ? 200 : 207});
     } catch (error) {
         return NextResponse.json({
             success: false,
