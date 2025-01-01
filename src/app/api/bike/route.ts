@@ -41,6 +41,10 @@ export async function POST(request: NextRequest) {
                 details,
             }, {status: allSuccessful ? 200 : 207});
         })
+        return NextResponse.json({
+            success: false,
+            details,
+        }, {status: 207});
     } catch (error) {
         return NextResponse.json({
             success: false,
