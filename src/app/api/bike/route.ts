@@ -5,6 +5,8 @@ import {db} from '@/db/index'
 export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const bikeID = formData.get('bike_id')
+    console.log(formData.get('action'))
+    console.log(Boolean(formData.get('action')))
     const action = Boolean(formData.get('action'))
     const coordinate = JSON.parse(formData.get('coordinate') as string)
     const time = formData.get('time')
@@ -41,10 +43,6 @@ export async function POST(request: NextRequest) {
             }
         })
         const allSuccessful = details.uploadedUsageData.success && details.uploadedBikeInfo.success;
-        console.log(details.uploadedUsageData.success)
-        console.log(details.uploadedBikeInfo.success)
-        console.log(details.uploadedUsageData.success && details.uploadedBikeInfo.success)
-        console.log(allSuccessful)
         return NextResponse.json({
             success: allSuccessful,
             details,
