@@ -15,6 +15,16 @@ export async function POST(request: NextRequest) {
     };
     try {
         await db.transaction(async (tx) => {
+            console.log({
+                bikeId: bikeID as string,
+                coordinate: coordinate as [number, number],
+                time: time as string,
+                action: action,
+            })
+            console.log({
+                bikeId: bikeID as string,
+                batteryRemainingCapacity: remainBatteryCapacity,
+            })
             try {
                 await pushUploadedUsageData({
                     bikeId: bikeID as string,
