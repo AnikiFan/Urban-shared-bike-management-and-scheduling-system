@@ -1,7 +1,7 @@
 import {pushUploadedSchedulingLog} from "@/lib/dal";
-import {NextResponse} from "next/server";
+import {NextResponse,NextRequest} from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const details = {
         uploadedSchedulingLog: {success: false, error: ''},
     };
@@ -11,7 +11,12 @@ export async function POST(request: Request) {
         const action = Boolean(formData.get('action'));
         const coordinate = JSON.parse(formData.get('coordinate') as string);
         const time = formData.get('time');
-
+        console.log({
+                action: action,
+                bikeId: bikeID as string,
+                coordinate: coordinate as [number, number],
+                time: time as string,
+            })
         try {
             await pushUploadedSchedulingLog({
                 action: action,

@@ -1,7 +1,7 @@
 import {pushUploadedChangeForm, pushUploadedSchedulingLog} from "@/lib/dal";
-import {NextResponse} from "next/server";
+import {NextResponse,NextRequest} from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const details = {
         uploadedSchedulingLog: {success: false, error: ''},
     };
@@ -12,6 +12,13 @@ export async function POST(request: Request) {
         const proofMaterials = formData.getAll('proof_materials')
         const status = formData.getAll('status')
         const time = formData.get('time')
+        console.log({
+                bikeId:bikeID as string,
+                time:time as string,
+                proofMaterials:proofMaterials as string[],
+                // @ts-ignore
+                status:status as string[]
+            })
         try {
             await pushUploadedChangeForm({
                 bikeId:bikeID as string,
