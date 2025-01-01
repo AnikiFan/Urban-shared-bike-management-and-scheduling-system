@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const bikeID = formData.get('bike_id');
-        const action = Boolean(formData.get('action'));
+        const action = formData.get('action') == 'True';
         const coordinate = JSON.parse(formData.get('coordinate') as string);
         const time = formData.get('time');
         try {

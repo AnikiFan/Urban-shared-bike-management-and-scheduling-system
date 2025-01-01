@@ -5,9 +5,7 @@ import {db} from '@/db/index'
 export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const bikeID = formData.get('bike_id')
-    console.log(formData.get('action'))
-    console.log(Boolean(formData.get('action')))
-    const action = Boolean(formData.get('action'))
+    const action = formData.get('action') == 'True'
     const coordinate = JSON.parse(formData.get('coordinate') as string)
     const time = formData.get('time')
     const remainBatteryCapacity = Number(formData.get('remain_battery_capacity'))
