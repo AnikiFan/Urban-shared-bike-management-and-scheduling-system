@@ -46,6 +46,9 @@ export async function POST(request: NextRequest) {
                 details.uploadedBikeInfo.error = error instanceof Error ? error.message : String(error);
             }
             const allSuccessful = details.uploadedUsageData.success && details.uploadedBikeInfo.success;
+            if(!allSuccessful){
+                tx.rollback()
+            }
             return NextResponse.json({
                 success: allSuccessful,
                 details,

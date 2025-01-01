@@ -28,15 +28,15 @@ export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsag
 }
 
 
-export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog)  {
+export async function pushUploadedSchedulingLog(schedulingLog: type.schedulingLog) {
     try {
-        await db.transaction(async(tx) =>{
-            await db.update(bike).set({coordinate:schedulingLog.coordinate}).where(eq(bike.bikeId,schedulingLog.bikeId))
+        await db.transaction(async (tx) => {
+            await db.update(bike).set({coordinate: schedulingLog.coordinate}).where(eq(bike.bikeId, schedulingLog.bikeId))
             await db.insert(scheduling).values({
-                bikeId:schedulingLog.bikeId,
-                coordinate:schedulingLog.coordinate,
-                action:schedulingLog.action,
-                time:schedulingLog.time,
+                bikeId: schedulingLog.bikeId,
+                coordinate: schedulingLog.coordinate,
+                action: schedulingLog.action,
+                time: schedulingLog.time,
             })
         })
     } catch (error) {
@@ -44,50 +44,56 @@ export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog
         throw new Error('Fail to push scheduling log')
     }
 }
- export async function pushUploadedChangeForm(uploadedChangeForm:type.uploadedChangeForm) {
-    await db.transaction(async(tx)=>{
-         await db.insert(toBeReviewed).values({bikeId:uploadedChangeForm.bikeId,time: uploadedChangeForm.time})
-         await db.insert(toBeReviewedStatus).values(uploadedChangeForm.status.map((status)=>{
-             return {
-                 bikeId:uploadedChangeForm.bikeId,
-                 time:uploadedChangeForm.time,
-                 status:status,
-             }
-         }))
-         await db.insert(toBeReviewedProofMaterial).values(
-             uploadedChangeForm.proofMaterials.map((proofMaterial,idx)=>{
-                 return {
-                     no:idx,
-                     bikeId:uploadedChangeForm.bikeId,
-                     time:uploadedChangeForm.time,
-                     proofMaterial:proofMaterial,
-                 }
-             })
-         )
-     })
+
+export async function pushUploadedChangeForm(uploadedChangeForm: type.uploadedChangeForm) {
+    try {
+        await db.transaction(async (tx) => {
+            await db.insert(toBeReviewed).values({bikeId: uploadedChangeForm.bikeId, time: uploadedChangeForm.time})
+            await db.insert(toBeReviewedStatus).values(uploadedChangeForm.status.map((status) => {
+                return {
+                    bikeId: uploadedChangeForm.bikeId,
+                    time: uploadedChangeForm.time,
+                    status: status,
+                }
+            }))
+            await db.insert(toBeReviewedProofMaterial).values(
+                uploadedChangeForm.proofMaterials.map((proofMaterial, idx) => {
+                    return {
+                        no: idx,
+                        bikeId: uploadedChangeForm.bikeId,
+                        time: uploadedChangeForm.time,
+                        proofMaterial: proofMaterial,
+                    }
+                })
+            )
+        })
+    }catch(error){
+        console.log('Database Error', error)
+        throw new Error('Fail to push change form')
+    }
 }
 
 
 export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeInfo) {
     try {
-        await db.update(bike).set({batteryRemainingCapacity:uploadedBikeInfo.batteryRemainingCapacity}).where(eq(bike.bikeId,uploadedBikeInfo.bikeId))
+        await db.update(bike).set({batteryRemainingCapacity: uploadedBikeInfo.batteryRemainingCapacity}).where(eq(bike.bikeId, uploadedBikeInfo.bikeId))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push uploaded bike data')
     }
 }
 
-export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeInfo)  {
+export async function pushBikeInfo({bikeId, coordinate, productionDate}: type.bikeInfo) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
         await db.insert(bike).values({
-            bikeId:bikeId,
-            coordinate:coordinate,
-            productionDate:productionDate,
-            batteryRemainingCapacity:1.0
+            bikeId: bikeId,
+            coordinate: coordinate,
+            productionDate: productionDate,
+            batteryRemainingCapacity: 1.0
         })
     } catch (error) {
         console.log('Database Error', error)
@@ -95,13 +101,13 @@ export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeI
     }
 }
 
-export async function pushParkingAreaInfo({name,coordinate,radius}: type.parkingAreaInfo) {
+export async function pushParkingAreaInfo({name, coordinate, radius}: type.parkingAreaInfo) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.insert(parkingArea).values({name:name,coordinate:coordinate,radius:radius});
+        await db.insert(parkingArea).values({name: name, coordinate: coordinate, radius: radius});
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push parking area')
@@ -110,11 +116,11 @@ export async function pushParkingAreaInfo({name,coordinate,radius}: type.parking
 
 export async function pushChangeForm({bikeId, status}: { bikeId: string, status: string[] }) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.transaction(async(tx)=>{
+        await db.transaction(async (tx) => {
             await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
             // @ts-ignore
             await db.insert(bikeStatus).values(status.map((status) => {
@@ -127,13 +133,19 @@ export async function pushChangeForm({bikeId, status}: { bikeId: string, status:
     }
 }
 
-export async function updateParkingArea({name,coordinate,radius,parkingAreaId}: type.parkingAreaInfo & {parkingAreaId:number}) {
+export async function updateParkingArea({name, coordinate, radius, parkingAreaId}: type.parkingAreaInfo & {
+    parkingAreaId: number
+}) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.update(parkingArea).set({name:name,coordinate: coordinate,radius:radius}).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)));
+        await db.update(parkingArea).set({
+            name: name,
+            coordinate: coordinate,
+            radius: radius
+        }).where(eq(parkingArea.parkingAreaId, Number(parkingAreaId)));
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push parking area')
@@ -141,15 +153,23 @@ export async function updateParkingArea({name,coordinate,radius,parkingAreaId}: 
 }
 
 
-export async function updateBike({bikeId,productionDate,batteryRemainingCapacity,status}:{bikeId:string,productionDate:string,batteryRemainingCapacity:number,status:string[]}) {
+export async function updateBike({bikeId, productionDate, batteryRemainingCapacity, status}: {
+    bikeId: string,
+    productionDate: string,
+    batteryRemainingCapacity: number,
+    status: string[]
+}) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.transaction(async(tx)=>{
-            await db.update(bike).set({productionDate:productionDate,batteryRemainingCapacity:batteryRemainingCapacity}).where(eq(bike.bikeId,bikeId));
-            await db.delete(bikeStatus).where(eq(bikeStatus.bikeId,bikeId));
+        await db.transaction(async (tx) => {
+            await db.update(bike).set({
+                productionDate: productionDate,
+                batteryRemainingCapacity: batteryRemainingCapacity
+            }).where(eq(bike.bikeId, bikeId));
+            await db.delete(bikeStatus).where(eq(bikeStatus.bikeId, bikeId));
             // @ts-ignore
             await db.insert(bikeStatus).values(status.map((status) => {
                 return {bikeId: bikeId, status: status}
@@ -161,9 +181,9 @@ export async function updateBike({bikeId,productionDate,batteryRemainingCapacity
     }
 }
 
-export async function updateLowBattery(threshold:number){
+export async function updateLowBattery(threshold: number) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -174,9 +194,9 @@ export async function updateLowBattery(threshold:number){
     }
 }
 
-export async function updateIdle(threshold:number){
+export async function updateIdle(threshold: number) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -187,9 +207,9 @@ export async function updateIdle(threshold:number){
     }
 }
 
-export async function updateLUFLT(threshold:number){
+export async function updateLUFLT(threshold: number) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -200,9 +220,9 @@ export async function updateLUFLT(threshold:number){
     }
 }
 
-export async function updateOutdated(threshold:string){
+export async function updateOutdated(threshold: string) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -215,11 +235,11 @@ export async function updateOutdated(threshold:string){
 
 export async function deleteReviewMaterials({bikeId, time}: { bikeId: string, time: string }) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.transaction(async(tx)=>{
+        await db.transaction(async (tx) => {
             await db.delete(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, bikeId), eq(toBeReviewedStatus.time, time)));
             await db.delete(toBeReviewedProofMaterial).where(and(eq(toBeReviewedProofMaterial.bikeId, bikeId), eq(toBeReviewedProofMaterial.time, time)));
             await db.delete(toBeReviewed).where(and(eq(toBeReviewed.bikeId, bikeId), eq(toBeReviewed.time, time)));
@@ -230,26 +250,26 @@ export async function deleteReviewMaterials({bikeId, time}: { bikeId: string, ti
     }
 }
 
-export async function deleteBike(bikeId:string){
+export async function deleteBike(bikeId: string) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.delete(bike).where(eq(bike.bikeId,bikeId))
+        await db.delete(bike).where(eq(bike.bikeId, bikeId))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to delete bike')
     }
 }
 
-export async function deleteParkingArea(parkingAreaId:number){
+export async function deleteParkingArea(parkingAreaId: number) {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        await db.delete(parkingArea).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)));
+        await db.delete(parkingArea).where(eq(parkingArea.parkingAreaId, Number(parkingAreaId)));
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to delete parking area')
@@ -258,7 +278,7 @@ export async function deleteParkingArea(parkingAreaId:number){
 
 export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -275,7 +295,7 @@ export async function fetchParkingAreaInfo(): Promise<type.parkingAreaInfo[]> {
 
 export async function fetchMapData(): Promise<type.mapData[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -292,7 +312,7 @@ export async function fetchMapData(): Promise<type.mapData[]> {
 
 export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -318,7 +338,7 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
 
 export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type.usage[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -332,7 +352,7 @@ export async function fetchUsageData(datetimeRange: datetimeRange): Promise<type
 
 export async function fetchPreviousStatus(bikeId: string): Promise<type.previousStatus> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -348,30 +368,40 @@ export async function fetchPreviousStatus(bikeId: string): Promise<type.previous
     }
 }
 
-export async function fetchBikeInfo(bikeId:string): Promise<{basic:type.bikeBasic[],status:{bikeId:string,status:string}[]}> {
+export async function fetchBikeInfo(bikeId: string): Promise<{
+    basic: type.bikeBasic[],
+    status: { bikeId: string, status: string }[]
+}> {
     console.debug('fetch bikeInfo', bikeId)
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        const basic = await db.select({bikeId:bike.bikeId,batteryRemainingCapacity:bike.batteryRemainingCapacity,productionDate:bike.productionDate}).from(bike).where(like(bike.bikeId, `${bikeId}%`))
-        const status = await db.select({bikeId:bikeStatus.bikeId,status:bikeStatus.status}).from(bikeStatus).where(inArray(bikeStatus.bikeId,basic.map((basic)=>basic.bikeId)))
-        return {basic:basic,status:status}
+        const basic = await db.select({
+            bikeId: bike.bikeId,
+            batteryRemainingCapacity: bike.batteryRemainingCapacity,
+            productionDate: bike.productionDate
+        }).from(bike).where(like(bike.bikeId, `${bikeId}%`))
+        const status = await db.select({
+            bikeId: bikeStatus.bikeId,
+            status: bikeStatus.status
+        }).from(bikeStatus).where(inArray(bikeStatus.bikeId, basic.map((basic) => basic.bikeId)))
+        return {basic: basic, status: status}
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to fetch bike info')
     }
 }
 
-export async function fetchChangeForm(): Promise<type.changeForm|null> {
+export async function fetchChangeForm(): Promise<type.changeForm | null> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
         const target = (await db.select().from(toBeReviewed).orderBy(toBeReviewed.time).limit(1))[0]
-        if(target==undefined){
+        if (target == undefined) {
             return null
         }
         const status = await db.select({status: toBeReviewedStatus.status}).from(toBeReviewedStatus).where(and(eq(toBeReviewedStatus.bikeId, target.bikeId), eq(toBeReviewedStatus.time, target.time)))
@@ -390,7 +420,7 @@ export async function fetchChangeForm(): Promise<type.changeForm|null> {
 
 export async function fetchSchedulingHistory(bikeId: string): Promise<type.schedulingHistory[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -407,7 +437,7 @@ export async function fetchSchedulingHistory(bikeId: string): Promise<type.sched
 
 export async function fetchBikeList(): Promise<{ bikeId: string }[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
@@ -418,16 +448,18 @@ export async function fetchBikeList(): Promise<{ bikeId: string }[]> {
     }
 }
 
-export async function fetchParkingAreaList(parkingAreaId:string):Promise<(parkingAreaInfo&{parkingAreaId:number})[]>{
+export async function fetchParkingAreaList(parkingAreaId: string): Promise<(parkingAreaInfo & {
+    parkingAreaId: number
+})[]> {
     const session = await getSession();
-    if(!session){
+    if (!session) {
         unauthorized()
     }
     try {
-        if(isNaN(Number(parkingAreaId))){
-            return await db.select().from(parkingArea).where(like(parkingArea.name,'%'+parkingAreaId+'%'))
-        }else{
-            return await db.select().from(parkingArea).where(eq(parkingArea.parkingAreaId,Number(parkingAreaId)))
+        if (isNaN(Number(parkingAreaId))) {
+            return await db.select().from(parkingArea).where(like(parkingArea.name, '%' + parkingAreaId + '%'))
+        } else {
+            return await db.select().from(parkingArea).where(eq(parkingArea.parkingAreaId, Number(parkingAreaId)))
         }
     } catch (error) {
         console.log('Database Error', error)
