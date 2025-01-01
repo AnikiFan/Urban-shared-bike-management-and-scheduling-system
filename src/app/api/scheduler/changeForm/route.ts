@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData()
         const bikeID = formData.get('bike_id')
-        const proofMaterials = JSON.parse(formData.get('proof_materials'))
+        const proofMaterials = JSON.parse(formData.get('proof_materials') as string)
         const status = formData.getAll('status')
         const time = formData.get('time')
         console.log(proofMaterials)
