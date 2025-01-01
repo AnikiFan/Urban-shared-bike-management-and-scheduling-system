@@ -7,8 +7,6 @@ export async function POST(request: NextRequest) {
     const bikeID = formData.get('bike_id')
     const action = Boolean(formData.get('action'))
     const coordinate = JSON.parse(formData.get('coordinate') as string)
-    console.log(formData.get('coordinate') )
-    console.log(JSON.parse(formData.get('coordinate') as string))
     const time = formData.get('time')
     const remainBatteryCapacity = Number(formData.get('remain_battery_capacity'))
     const details = {
@@ -43,6 +41,10 @@ export async function POST(request: NextRequest) {
             }
         })
         const allSuccessful = details.uploadedUsageData.success && details.uploadedBikeInfo.success;
+        console.log(details.uploadedUsageData.success)
+        console.log(details.uploadedBikeInfo.success)
+        console.log(details.uploadedUsageData.success && details.uploadedBikeInfo.success)
+        console.log(allSuccessful)
         return NextResponse.json({
             success: allSuccessful,
             details,
