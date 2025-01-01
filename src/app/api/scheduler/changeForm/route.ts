@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
         const proofMaterials = formData.getAll('proof_materials')
         const status = formData.getAll('status')
         const time = formData.get('time')
+        console.log(proofMaterials)
+        console.log(typeof proofMaterials)
         try {
             await pushUploadedChangeForm({
                 bikeId:bikeID as string,
