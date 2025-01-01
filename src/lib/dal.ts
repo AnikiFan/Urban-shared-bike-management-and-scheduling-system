@@ -19,10 +19,6 @@ import {getSession} from "@/lib/auth";
 import {unauthorized} from "next/navigation";
 
 export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsageData) {
-    const session = await getSession();
-    if(!session){
-        unauthorized()
-    }
     try {
         await db.insert(usage).values(uploadedUsageData)
     } catch (error) {
@@ -31,29 +27,8 @@ export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsag
     }
 }
 
-export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeInfo)  {
-    const session = await getSession();
-    if(!session){
-        unauthorized()
-    }
-    try {
-        await db.insert(bike).values({
-            bikeId:bikeId,
-            coordinate:coordinate,
-            productionDate:productionDate,
-            batteryRemainingCapacity:1.0
-        })
-    } catch (error) {
-        console.log('Database Error', error)
-        throw new Error('Fail to push bike info')
-    }
-}
 
 export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog)  {
-    const session = await getSession();
-    if(!session){
-        unauthorized()
-    }
     try {
         await db.transaction(async(tx) =>{
             await db.update(bike).set({coordinate:schedulingLog.coordinate}).where(eq(bike.bikeId,schedulingLog.bikeId))
@@ -94,15 +69,29 @@ export async function pushUploadedSchedulingLog(schedulingLog:type.schedulingLog
 
 
 export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeInfo) {
-    const session = await getSession();
-    if(!session){
-        unauthorized()
-    }
     try {
         await db.update(bike).set({batteryRemainingCapacity:uploadedBikeInfo.batteryRemainingCapacity}).where(eq(bike.bikeId,uploadedBikeInfo.bikeId))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push uploaded bike data')
+    }
+}
+
+export async function pushBikeInfo({bikeId,coordinate,productionDate}:type.bikeInfo)  {
+    const session = await getSession();
+    if(!session){
+        unauthorized()
+    }
+    try {
+        await db.insert(bike).values({
+            bikeId:bikeId,
+            coordinate:coordinate,
+            productionDate:productionDate,
+            batteryRemainingCapacity:1.0
+        })
+    } catch (error) {
+        console.log('Database Error', error)
+        throw new Error('Fail to push bike info')
     }
 }
 
