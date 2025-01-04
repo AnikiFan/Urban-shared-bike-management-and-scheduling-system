@@ -1,5 +1,7 @@
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE
+    EXTENSION IF NOT EXISTS pgcrypto;
+CREATE
+    EXTENSION IF NOT EXISTS postgis;
 
 DROP TABLE IF EXISTS bike CASCADE;
 DROP TABLE IF EXISTS to_be_reviewed_status CASCADE;
@@ -32,14 +34,6 @@ CREATE TABLE bike
     production_date            date                                                     NOT NULL,
     coordinate                 point                                                    NOT NULL,
     battery_remaining_capacity real CHECK ( battery_remaining_capacity BETWEEN 0 AND 1) NOT NULL
-);
-
-CREATE TABLE to_be_reviewed_status
-(
-    bike_ID char(20) REFERENCES bike ON DELETE CASCADE,
-    time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status  status,
-    PRIMARY KEY (bike_ID, time, status)
 );
 
 CREATE TABLE bike_status
@@ -82,14 +76,25 @@ CREATE TABLE to_be_reviewed
     PRIMARY KEY (bike_ID, time)
 );
 
+CREATE TABLE to_be_reviewed_status
+(
+    bike_ID char(20),
+    time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status  status,
+    PRIMARY KEY (bike_ID, time, status),
+    FOREIGN KEY (bike_ID, time) REFERENCES to_be_reviewed ON DELETE CASCADE
+);
+
 
 CREATE TABLE to_be_reviewed_proof_material
 (
-    bike_ID        char(20) REFERENCES bike ON DELETE CASCADE,
+    bike_ID        char(20),
     time           TIMESTAMP,
-    no             smallint CHECK ( no >= 0 ),
+    no             smallint CHECK ( no >= 0
+        ),
     proof_material text NOT NULL,
-    PRIMARY KEY (bike_ID, time, no)
+    PRIMARY KEY (bike_ID, time, no),
+    FOREIGN KEY (bike_ID, time) REFERENCES to_be_reviewed ON DELETE CASCADE
 );
 
 CREATE TABLE contain
@@ -99,7 +104,8 @@ CREATE TABLE contain
     PRIMARY KEY (bike_ID, parking_area_ID)
 );
 
-CREATE OR REPLACE FUNCTION create_manager(email TEXT, password TEXT)
+CREATE
+    OR REPLACE FUNCTION create_manager(email TEXT, password TEXT)
     RETURNS BOOLEAN AS
 $$
 BEGIN
@@ -112,9 +118,11 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION create_analyst(email TEXT, password TEXT)
+CREATE
+    OR REPLACE FUNCTION create_analyst(email TEXT, password TEXT)
     RETURNS BOOLEAN AS
 $$
 BEGIN
@@ -127,25 +135,31 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION check_password(email_ TEXT, password_ TEXT)
+CREATE
+    OR REPLACE FUNCTION check_password(email_ TEXT, password_ TEXT)
     RETURNS BOOLEAN AS
 $$
 BEGIN
-    PERFORM *
+    PERFORM
+        *
     from users
     WHERE email_ = email
       AND crypt(password_, 'bf') = encrypted_password;
 
-    IF FOUND THEN
+    IF
+        FOUND THEN
         RETURN TRUE;
     END IF;
     return FALSE;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION mark_low_battery(threshold REAL)
+CREATE
+    OR REPLACE FUNCTION mark_low_battery(threshold REAL)
     RETURNS VOID AS
 $$
 BEGIN
@@ -154,15 +168,17 @@ BEGIN
     FROM bike_status
     WHERE status = 'LOW_BATTERY';
 
-    -- 插入电池容量低于阈值的单车到 bike_status 表
+-- 插入电池容量低于阈值的单车到 bike_status 表
     INSERT INTO bike_status (bike_ID, status)
     SELECT b.bike_ID, 'LOW_BATTERY'
     FROM bike b
     WHERE b.battery_remaining_capacity < threshold;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION mark_idle_bikes(x INTEGER)
+CREATE
+    OR REPLACE FUNCTION mark_idle_bikes(x INTEGER)
     RETURNS VOID AS
 $$
 BEGIN
@@ -171,7 +187,7 @@ BEGIN
     FROM bike_status
     WHERE status = 'IDLE';
 
-    -- 插入过去 x 天内未使用的单车到 bike_status 表
+-- 插入过去 x 天内未使用的单车到 bike_status 表
     INSERT INTO bike_status (bike_ID, status)
     SELECT b.bike_ID, 'IDLE'
     FROM bike b
@@ -181,8 +197,10 @@ BEGIN
                         AND u.time >= NOW() - INTERVAL '1 day' * x);
 END;
 
-$$ LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION update_luflt_status(x INTEGER)
+$$
+    LANGUAGE plpgsql;
+CREATE
+    OR REPLACE FUNCTION update_luflt_status(x INTEGER)
     RETURNS VOID AS
 $$
 BEGIN
@@ -191,18 +209,23 @@ BEGIN
     FROM bike_status
     WHERE status = 'LUFLT';
 
-    -- 插入符合条件的单车到 bike_status 表
+-- 插入符合条件的单车到 bike_status 表
     INSERT INTO bike_status (bike_ID, status)
     SELECT u.bike_ID, 'LUFLT'
-    FROM (SELECT DISTINCT ON (bike_ID) bike_ID, time, action
+    FROM (SELECT DISTINCT
+        ON (bike_ID) bike_ID,
+                     time,
+                     action
           FROM usage
           ORDER BY bike_ID, time DESC) u
     WHERE u.action = TRUE
       AND u.time <= NOW() - INTERVAL '1 hour' * x;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION update_outdated_status(target_date DATE)
+CREATE
+    OR REPLACE FUNCTION update_outdated_status(target_date DATE)
     RETURNS VOID AS
 $$
 BEGIN
@@ -211,13 +234,14 @@ BEGIN
     FROM bike_status
     WHERE status = 'OUTDATED';
 
-    -- 插入符合条件的单车到 bike_status 表
+-- 插入符合条件的单车到 bike_status 表
     INSERT INTO bike_status (bike_ID, status)
     SELECT bike_ID, 'OUTDATED'
     FROM bike
     WHERE production_date < target_date;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
 
 SELECT "create_analyst"('analyst@email.com', 'test');
@@ -246,77 +270,128 @@ CREATE INDEX idx_contain ON contain (bike_id);
 
 CREATE INDEX idx_contain_ ON contain (parking_area_id);
 
-CREATE OR REPLACE FUNCTION update_on_parking_area_change()
+CREATE
+    OR REPLACE FUNCTION update_on_parking_area_change()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    DELETE
-    FROM bike_status
-    WHERE status = 'ILLEGAL_PARKING'
-      AND NOT EXISTS(SELECT 1
-                     FROM contain
-                     WHERE bike_id = bike_status.bike_id
-                       AND parking_area_ID = NEW.parking_area_id);
+    IF
+        TG_OP = 'INSERT' THEN
+        INSERT INTO contain (bike_id, parking_area_id)
+        SELECT b.bike_id, NEW.parking_area_id
+        FROM bike b
+        WHERE st_distance(ST_SetSRID(b.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <=
+              NEW.radius;
 
-    DELETE
-    FROM contain
-    WHERE parking_area_id = NEW.parking_area_id;
+        DELETE
+        FROM bike_status
+        WHERE status = 'ILLEGAL_PARKING'
+          AND bike_ID IN (SELECT bike_ID
+                          FROM contain
+                          WHERE parking_area_ID = NEW.parking_area_id);
 
-    INSERT INTO contain (bike_id, parking_area_id)
-    SELECT b.bike_id, NEW.parking_area_id
-    FROM bike b
-    WHERE
-        st_distance(ST_SetSRID(b.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <= NEW.radius;
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT
+        INTO bike_status(bike_id, status)
+        SELECT b.bike_id, 'ILLEGAL_PARKING'
+        FROM bike b
+        WHERE NOT EXISTS(SELECT *
+                         FROM contain
+                         WHERE b.bike_ID = contain.bike_ID
+                           AND contain.parking_area_ID <> OLD.parking_area_id);
 
-    INSERT INTO bike_status(bike_id, status)
-    SELECT bike_id, 'ILLEGAL_PARKING'
-    FROM contain
-    WHERE parking_area_id = NEW.parking_area_id
-    ON CONFLICT DO NOTHING; -- 因为之前并没有将所有的ILLEGAL_PARKING状态对于的记录都删去
 
-    RETURN NEW;
+        INSERT INTO contain (bike_id, parking_area_id)
+        SELECT b.bike_id, NEW.parking_area_id
+        FROM bike b
+        WHERE st_distance(ST_SetSRID(b.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <=
+              NEW.radius;
+
+        DELETE
+        FROM bike_status
+        WHERE status = 'ILLEGAL_PARKING'
+          AND bike_ID IN (SELECT bike_ID
+                          FROM contain
+                          WHERE parking_area_ID = NEW.parking_area_id);
+
+
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT
+        INTO bike_status(bike_id, status)
+        SELECT b.bike_id, 'ILLEGAL_PARKING'
+        FROM bike b
+        WHERE NOT EXISTS(SELECT *
+                         FROM contain
+                         WHERE b.bike_ID = contain.bike_ID
+                           AND contain.parking_area_ID <> OLD.parking_area_id);
+    END IF;
+    RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER trigger_parking_area
-    AFTER INSERT OR UPDATE
+CREATE
+    OR REPLACE TRIGGER trigger_parking_area
+    AFTER INSERT OR UPDATE OR DELETE
     ON parking_area
     FOR EACH ROW
 EXECUTE FUNCTION update_on_parking_area_change();
 
-CREATE OR REPLACE FUNCTION update_on_bike_change()
+CREATE
+    OR REPLACE FUNCTION update_on_bike_change()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    DELETE
-    FROM bike_status
-    WHERE bike_id = NEW.bike_id AND status = 'ILLEGAL_PARKING';
+    IF
+        TG_OP = 'INSERT' THEN
+        INSERT INTO contain (bike_id, parking_area_id)
+        SELECT NEW.bike_id, parking_area_ID
+        FROM parking_area p
+        WHERE st_distance(ST_SetSRID(p.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <=
+              p.radius;
 
-    DELETE
-    FROM contain
-    WHERE bike_id = NEW.bike_id;
+        IF
+            NOT EXISTS(SELECT 1
+                   FROM contain
+                   WHERE contain.bike_id = NEW.bike_id) THEN
+            INSERT INTO bike_status(bike_id, status)
+            VALUES (NEW.bike_id, 'ILLEGAL_PARKING');
+        END IF;
+    ELSIF TG_OP = 'UPDATE' THEN
 
-    INSERT INTO contain (bike_id, parking_area_id)
-    SELECT NEW.bike_id, parking_area_ID
-    FROM parking_area p
-    WHERE
-        st_distance(ST_SetSRID(p.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <= p.radius;
+        DELETE
+        FROM bike_status
+        WHERE status = 'ILLEGAL_PARKING'
+          AND bike_ID = OLD.bike_id;
 
-    IF EXISTS(
-        SELECT 1
+        DELETE
         FROM contain
-        WHERE contain.bike_id = NEW.bike_id
-    ) THEN
-        INSERT INTO bike_status(bike_id, status)
-        VALUES(NEW.bike_id,'ILLEGAL_PARKING');
+        WHERE bike_ID = OLD.bike_id;
+
+        INSERT INTO contain (bike_id, parking_area_id)
+        SELECT NEW.bike_id, parking_area_ID
+        FROM parking_area p
+        WHERE st_distance(ST_SetSRID(p.coordinate::geometry, 4326), ST_SetSRID(NEW.coordinate::geometry, 4326)) <=
+              p.radius;
+
+        IF
+            NOT EXISTS(SELECT 1
+                   FROM contain
+                   WHERE contain.bike_id = NEW.bike_id) THEN
+            INSERT INTO bike_status(bike_id, status)
+            VALUES (NEW.bike_id, 'ILLEGAL_PARKING');
+        END IF;
+
     END IF;
-
-    RETURN NEW;
+    RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$
+    LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER trigger_bike
-    AFTER INSERT OR UPDATE
+CREATE
+    OR REPLACE TRIGGER trigger_bike
+    AFTER INSERT OR
+        UPDATE
     ON bike
     FOR EACH ROW
 EXECUTE FUNCTION update_on_bike_change();

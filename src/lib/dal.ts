@@ -13,7 +13,7 @@ import {
     usage
 } from "@/db/schema";
 import {and, count, desc, eq, gte, inArray, like, lt, or, sql} from "drizzle-orm";
-import {changeForm, datetimeRange, parkingAreaInfo} from "@/lib/definition";
+import {bikeStatusName, changeForm, datetimeRange, parkingAreaInfo} from "@/lib/definition";
 import {toPostgreTimestamp} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 import {unauthorized} from "next/navigation";
@@ -317,18 +317,22 @@ export async function fetchBikeStatistics(): Promise<type.bikeStatistics> {
     }
     try {
         const bikeNum = (await db.select({count: count()}).from(bike))[0].count
-        const bikeStatistics = await db.select({count: count()}).from(bikeStatus).groupBy(bikeStatus.status)
+        const bikeStatistics = await db.select({status:bikeStatus.status,count: count()}).from(bikeStatus).groupBy(bikeStatus.status)
+        const getValueByKey = (status:string,array:{status:string,count:number}[]):number=>{
+            const entry = array.find(item=>item.status == status )
+            return entry ? entry.count : 0
+        }
         return {
             bikeNum, // 使用传入的 bikeNum
-            normalNum: bikeStatistics[0]?.count || 0,
-            illegalParkingNum: bikeStatistics[1]?.count || 0,
-            lowBatteryNum: bikeStatistics[2]?.count || 0,
-            idleNum: bikeStatistics[3]?.count || 0,
-            LUFLTNum: bikeStatistics[4]?.count || 0,
-            abnormalNum: bikeStatistics[5]?.count || 0,
-            toMaintainNum: bikeStatistics[6]?.count || 0,
-            outdatedNum: bikeStatistics[7]?.count || 0,
-            inStorageNum: bikeStatistics[8]?.count || 0
+            normalNum: getValueByKey('NORMAL',bikeStatistics),
+            illegalParkingNum: getValueByKey('ILLEGAL_PARKING',bikeStatistics),
+            lowBatteryNum: getValueByKey('LOW_BATTERY',bikeStatistics),
+            idleNum: getValueByKey('IDLE',bikeStatistics),
+            LUFLTNum: getValueByKey('LUFLT',bikeStatistics),
+            abnormalNum: getValueByKey('ABNORMAL',bikeStatistics),
+            toMaintainNum: getValueByKey('TO_MAINTAIN',bikeStatistics),
+            outdatedNum: getValueByKey('OUTDATED',bikeStatistics),
+            inStorageNum: getValueByKey('IN_STORAGE',bikeStatistics)
         };
     } catch (error) {
         console.log('Database Error', error)
