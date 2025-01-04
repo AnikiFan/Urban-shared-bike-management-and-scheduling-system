@@ -363,7 +363,7 @@ export async function fetchPreviousStatus(bikeId: string): Promise<type.previous
         const status = await db.select({status: bikeStatus.status}).from(bikeStatus).where(eq(bikeStatus.bikeId, bikeId))
         const lastUsedTime = await db.select({lastUsedTime: usage.time}).from(usage).where(eq(usage.bikeId, bikeId)).orderBy(usage.time).limit(1)
         return {
-            lastUsedTime: lastUsedTime[0].lastUsedTime,
+            lastUsedTime: lastUsedTime[0] ? lastUsedTime[0].lastUsedTime:'1900-1-1 00:00:00',
             status: status.map((status) => status.status)
         }
     } catch (error) {
