@@ -16,7 +16,7 @@ from enum import Enum
 
 class Status(Enum):
     NORMAL = 'NORMAL'
-    ILLEGAL_PARKING = 'ILLEGAL_PARKING'
+    # ILLEGAL_PARKING = 'ILLEGAL_PARKING' 通过触发器自动维护
     LOW_BATTERY = 'LOW_BATTERY'
     IDLE = 'IDLE'
     LUFLT = 'LUFLT'

@@ -280,27 +280,29 @@ BEGIN
         INSERT INTO contain (bike_id, parking_area_id)
         SELECT b.bike_id, NEW.parking_area_id
         FROM bike b
-        WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0],b.coordinate[1]), 4326)::geography, ST_SetSRID(ST_makepoint(NEW.coordinate[0],NEW.coordinate[1]), 4326)::geography) <=NEW.radius;
+        WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0], b.coordinate[1]), 4326)::geography,
+                          ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <=
+              NEW.radius;
 
         DELETE
         FROM bike_status
         WHERE status = 'ILLEGAL_PARKING'
-          AND bike_ID IN (SELECT bike_ID
-                          FROM contain
-                          WHERE contain.parking_area_id = NEW.parking_area_id);
+          AND bike_id in (SELECT bike_id
+                          from contain
+                          WHERE contain.parking_area_ID = NEW.parking_area_id);
 
     ELSIF TG_OP = 'UPDATE' THEN
         DELETE
         FROM contain
         WHERE contain.parking_area_ID = OLD.parking_area_ID;
 
-        RAISE NOTICE 'BEFORE update: % , NEW %',OLD.parking_area_id,NEW.parking_area_id;
 
         INSERT INTO contain (bike_id, parking_area_id)
         SELECT b.bike_id, NEW.parking_area_id
         FROM bike b
-        WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0],b.coordinate[1]), 4326)::geography, ST_SetSRID(ST_makepoint(NEW.coordinate[0],NEW.coordinate[1]), 4326)::geography) <=NEW.radius;
-
+        WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0], b.coordinate[1]), 4326)::geography,
+                          ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <=
+              NEW.radius;
 
 
         DELETE
@@ -308,16 +310,21 @@ BEGIN
         WHERE status = 'ILLEGAL_PARKING'
           AND bike_ID IN (SELECT b.bike_id
                           FROM bike b
-                          WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0],b.coordinate[1]), 4326)::geography, ST_SetSRID(ST_makepoint(NEW.coordinate[0],NEW.coordinate[1]), 4326)::geography) <=NEW.radius);
+                          WHERE st_distance(ST_SetSRID(ST_makepoint(b.coordinate[0], b.coordinate[1]), 4326)::geography,
+                                            ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]),
+                                                       4326)::geography) <= NEW.radius);
 
         INSERT
         INTO bike_status(bike_id, status)
         SELECT b.bike_id, 'ILLEGAL_PARKING'
         FROM bike b
-        WHERE NOT EXISTS(
-            SELECT * FROM contain
-            WHERE contain.bike_ID = b.bike_ID
-        );
+        WHERE NOT EXISTS(SELECT 1
+                         FROM contain
+                         WHERE contain.bike_ID = b.bike_ID)
+          AND NOT EXISTS(SELECT 1
+                         FROM bike_status
+                         WHERE bike_status.bike_ID = b.bike_ID
+                           AND bike_status.status = 'ILLEGAL_PARKING');
 
 
     ELSIF TG_OP = 'DELETE' THEN
@@ -325,11 +332,11 @@ BEGIN
         INTO bike_status(bike_id, status)
         SELECT b.bike_id, 'ILLEGAL_PARKING'
         FROM bike b
-        WHERE NOT EXISTS(SELECT *
+        WHERE NOT EXISTS(SELECT 1
                          FROM contain
                          WHERE b.bike_ID = contain.bike_ID
                            AND contain.parking_area_ID <> OLD.parking_area_id)
-          AND NOT EXISTS(SELECT *
+          AND NOT EXISTS(SELECT 1
                          FROM bike_status
                          WHERE bike_status.bike_ID = b.bike_ID
                            AND bike_status.status = 'ILLEGAL_PARKING');
@@ -356,7 +363,8 @@ BEGIN
         INSERT INTO contain (bike_id, parking_area_id)
         SELECT NEW.bike_id, parking_area_ID
         FROM parking_area p
-        WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0],p.coordinate[1]), 4326)::geography, ST_SetSRID(ST_makepoint(NEW.coordinate[0],NEW.coordinate[1]), 4326)::geography) <=p.radius;
+        WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0], p.coordinate[1]), 4326)::geography,
+                          ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <= p.radius;
 
         IF
             NOT EXISTS(SELECT 1
@@ -379,7 +387,8 @@ BEGIN
         INSERT INTO contain (bike_id, parking_area_id)
         SELECT NEW.bike_id, parking_area_ID
         FROM parking_area p
-        WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0],p.coordinate[1]), 4326)::geography, ST_SetSRID(ST_makepoint(NEW.coordinate[0],NEW.coordinate[1]), 4326)::geography) <=p.radius;
+        WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0], p.coordinate[1]), 4326)::geography,
+                          ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <= p.radius;
 
         IF
             NOT EXISTS(SELECT 1

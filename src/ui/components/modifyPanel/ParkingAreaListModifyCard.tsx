@@ -18,6 +18,7 @@ import {deleteParkingArea, fetchParkingAreaInfo} from "@/lib/dal";
 import {createParkingArea, deleteParkingAreaAction, getParkingAreaList, updateParkingAreaAction} from "@/lib/actions";
 import {DeleteIcon, EditIcon} from "@/ui/icons";
 import {englishToChinese, palette} from "@/lib/const";
+import {revalidatePath} from "next/cache";
 
 
 export default function () {
@@ -90,6 +91,7 @@ export default function () {
                                                     onPress={(e) => {
                                                         deleteParkingAreaAction(value.parkingAreaId)
                                                         setParkingAreaList((prev) => prev.filter(parkingArea => parkingArea.parkingAreaId !== value.parkingAreaId))
+                                                        revalidatePath('/dashboard/modifyPanel')
                                                     }}
                                                 ><DeleteIcon/></Button>
                                             </section>
