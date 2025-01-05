@@ -101,6 +101,7 @@ export type timePeriod={
 export type uploadedBikeInfo={
     bikeId: typeof bike.$inferInsert.bikeId,
     batteryRemainingCapacity: typeof bike.$inferInsert.batteryRemainingCapacity,
+    coordinate: typeof bike.$inferInsert.coordinate,
 };
 
 export type bikeStatistics={

@@ -374,28 +374,33 @@ BEGIN
             VALUES (NEW.bike_id, 'ILLEGAL_PARKING');
         END IF;
     ELSIF TG_OP = 'UPDATE' THEN
+        IF NEW.coordinate[0] = OLD.coordinate[0] AND NEW.coordinate[1] = OLD.coordinate[1]
+        THEN
+            RETURN NULL;
+        ELSE
+            DELETE
+            FROM bike_status
+            WHERE status = 'ILLEGAL_PARKING'
+              AND bike_ID = OLD.bike_id;
 
-        DELETE
-        FROM bike_status
-        WHERE status = 'ILLEGAL_PARKING'
-          AND bike_ID = OLD.bike_id;
+            DELETE
+            FROM contain
+            WHERE bike_ID = OLD.bike_id;
 
-        DELETE
-        FROM contain
-        WHERE bike_ID = OLD.bike_id;
+            INSERT INTO contain (bike_id, parking_area_id)
+            SELECT NEW.bike_id, parking_area_ID
+            FROM parking_area p
+            WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0], p.coordinate[1]), 4326)::geography,
+                              ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <=
+                  p.radius;
 
-        INSERT INTO contain (bike_id, parking_area_id)
-        SELECT NEW.bike_id, parking_area_ID
-        FROM parking_area p
-        WHERE st_distance(ST_SetSRID(ST_makepoint(p.coordinate[0], p.coordinate[1]), 4326)::geography,
-                          ST_SetSRID(ST_makepoint(NEW.coordinate[0], NEW.coordinate[1]), 4326)::geography) <= p.radius;
-
-        IF
-            NOT EXISTS(SELECT 1
-                       FROM contain
-                       WHERE contain.bike_id = NEW.bike_id) THEN
-            INSERT INTO bike_status(bike_id, status)
-            VALUES (NEW.bike_id, 'ILLEGAL_PARKING');
+            IF
+                NOT EXISTS(SELECT 1
+                           FROM contain
+                           WHERE contain.bike_id = NEW.bike_id) THEN
+                INSERT INTO bike_status(bike_id, status)
+                VALUES (NEW.bike_id, 'ILLEGAL_PARKING');
+            END IF;
         END IF;
 
     END IF;

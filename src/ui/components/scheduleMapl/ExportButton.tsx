@@ -1,6 +1,7 @@
 'use client'
 import {Button} from "@nextui-org/react";
 import {requiredSchedulingHistory} from "@/lib/definition";
+import {revalidatePath} from "next/cache";
 
 export default function ({schedulingHistory,selected}:{schedulingHistory:requiredSchedulingHistory[],selected:string}) {
     const handleExport = () => {

@@ -1,5 +1,6 @@
 import {pushUploadedSchedulingLog} from "@/lib/dal";
 import {NextResponse,NextRequest} from "next/server";
+import {revalidatePath} from "next/cache";
 
 export async function POST(request: NextRequest) {
     const details = {
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         const allSuccessful = details.uploadedSchedulingLog.success;
+        revalidatePath('/dashboard/scheduleMap')
 
         return NextResponse.json({success: allSuccessful, details,},
             {

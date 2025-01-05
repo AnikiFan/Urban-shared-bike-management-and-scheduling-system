@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
                 await pushUploadedBikeInfo({
                     bikeId: bikeID as string,
                     batteryRemainingCapacity: remainBatteryCapacity,
+                    coordinate: coordinate as [number, number],
                 });
                 details.uploadedBikeInfo.success = true;
             } catch (error) {

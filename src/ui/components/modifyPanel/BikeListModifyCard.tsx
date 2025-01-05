@@ -132,7 +132,6 @@ export default function () {
                                           getBikeInfo(term).then((bikeList) => {
                                               setBikeList(bikeList)
                                           })
-                                          revalidatePath('/dashboard/modifyPanel')
                                       }}>
                                     <Input
                                         label="Remaining Battery Capacity"

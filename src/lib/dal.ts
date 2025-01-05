@@ -29,6 +29,7 @@ export async function pushUploadedUsageData(uploadedUsageData: type.uploadedUsag
 
 
 export async function pushUploadedSchedulingLog(schedulingLog: type.schedulingLog) {
+    console.log('Pushing scheduling log', schedulingLog);
     try {
         await db.transaction(async (tx) => {
             await db.update(bike).set({coordinate: schedulingLog.coordinate}).where(eq(bike.bikeId, schedulingLog.bikeId))
@@ -76,7 +77,7 @@ export async function pushUploadedChangeForm(uploadedChangeForm: type.uploadedCh
 
 export async function pushUploadedBikeInfo(uploadedBikeInfo: type.uploadedBikeInfo) {
     try {
-        await db.update(bike).set({batteryRemainingCapacity: uploadedBikeInfo.batteryRemainingCapacity}).where(eq(bike.bikeId, uploadedBikeInfo.bikeId))
+        await db.update(bike).set({batteryRemainingCapacity: uploadedBikeInfo.batteryRemainingCapacity,coordinate:uploadedBikeInfo.coordinate}).where(eq(bike.bikeId, uploadedBikeInfo.bikeId))
     } catch (error) {
         console.log('Database Error', error)
         throw new Error('Fail to push uploaded bike data')

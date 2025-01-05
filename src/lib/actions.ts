@@ -54,6 +54,7 @@ export async function getBikeList(){
 
 export async function getSchedulingHistory(bikeId:string){
     const schedulingHistory = await fetchSchedulingHistory(bikeId);
+    console.log(schedulingHistory);
     const result:requiredSchedulingHistory[] = [];
     for(let i = 0; i<schedulingHistory.length-1; i++){
         const current = schedulingHistory[i];

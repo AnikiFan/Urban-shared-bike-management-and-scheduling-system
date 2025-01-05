@@ -41,7 +41,7 @@ export default function ({mapData,parkingAreaInfo}:{mapData:mapData[],parkingAre
             data: parkingAreaInfo,
             getPosition:(d:parkingAreaInfo)=>d.coordinate,
             getRadius:(d:parkingAreaInfo)=>d.radius,
-            radiusScale:3,
+            radiusScale:1,
             radiusMinPixels:3,
             pickable: true,
             filled:true,

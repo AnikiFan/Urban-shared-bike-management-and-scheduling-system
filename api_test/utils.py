@@ -57,7 +57,7 @@ def generate_scheduler_scheduling_log(bike_id, start_time, start_coordinate, end
     return ({
                 "bike_id": bike_id,
                 "coordinate": str(start_coordinate),
-                "time": (start_time + timedelta(minutes=interval)).strftime('%Y-%m-%d %H:%M:%S'),
+                "time": (start_time - timedelta(minutes=interval)).strftime('%Y-%m-%d %H:%M:%S'),
                 "action": True
             }, {
                 "bike_id": bike_id,
